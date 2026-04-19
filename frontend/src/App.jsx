@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import './App.css'
 import { languages, t } from './i18n'
@@ -10,11 +9,7 @@ import { resolveLocation } from './locationResolver.js'
 import DriverPage from './DriverPage.jsx'
 import { apiFetch } from './apiBase.js'
 
-// ------------------------------
-// URL helpers
-// ------------------------------
 function getInitialModeFromUrl() {
-  // 初始不靠 URL 決定顯示哪頁：一律 Landing
   return 'rider'
 }
 
@@ -47,9 +42,6 @@ function setUrlParams({ role, auth }) {
   } catch {}
 }
 
-// ------------------------------
-// Error stringify helper
-// ------------------------------
 function toMessage(x) {
   if (x == null) return ''
   if (typeof x === 'string') return x
@@ -66,9 +58,6 @@ function toMessage(x) {
   return String(x)
 }
 
-// ------------------------------
-// ID + compatibility helpers
-// ------------------------------
 function sameId(a, b) {
   const A = Number(a)
   const B = Number(b)
@@ -86,15 +75,12 @@ function normalizeOrderDriverId(o) {
   return { ...o, driverId: did }
 }
 
-// ------------------------------
-// ✅ Auth persistence (driver/passenger 分離)
-// ------------------------------
-const AUTH_PASSENGER_CRED_KEY = 'auth:passenger:credV1' // { username, password }
-const AUTH_PASSENGER_USER_KEY = 'auth:passenger:userV1' // { username, role:'passenger' }
+const AUTH_PASSENGER_CRED_KEY = 'auth:passenger:credV1'
+const AUTH_PASSENGER_USER_KEY = 'auth:passenger:userV1'
 
-const AUTH_DRIVER_CRED_KEY = 'auth:driver:credV1' // { username, carType }
-const AUTH_DRIVER_USER_KEY = 'auth:driver:userV1' // { username, role:'driver' }
-const AUTH_DRIVER_ID_KEY = 'auth:driver:driverIdV1' // number
+const AUTH_DRIVER_CRED_KEY = 'auth:driver:credV1'
+const AUTH_DRIVER_USER_KEY = 'auth:driver:userV1'
+const AUTH_DRIVER_ID_KEY = 'auth:driver:driverIdV1'
 
 function readJson(key) {
   try {
@@ -175,9 +161,6 @@ function writeAuthDriverId(id) {
   } catch {}
 }
 
-// ------------------------------
-// Driver last position local override
-// ------------------------------
 function loadLocalDriverPos(driverId) {
   if (driverId == null) return null
   try {
@@ -213,9 +196,6 @@ function enforceManualDriverPos(driversRows, currentDriverId) {
   })
 }
 
-// ------------------------------
-// Global sim state
-// ------------------------------
 const SIM_GLOBAL_KEY = 'simGlobal:running'
 function readGlobalSimRunning() {
   try {
@@ -232,10 +212,6 @@ function writeGlobalSimRunning(v) {
   } catch {}
 }
 
-// ------------------------------
-// ✅ 車輛 replay pause/resume（避免切回來重跑）
-// 使用 MapView 同一套 sim 結構：localStorage key = `sim:${orderKey}`
-// ------------------------------
 function simStorageKey(orderKey) {
   return `sim:${orderKey}`
 }
@@ -268,9 +244,6 @@ function resumeSim(orderKey) {
   writeSim(orderKey, { ...c, running: true, startedAt: Date.now() })
 }
 
-// ------------------------------
-// Completed orders (local override)
-// ------------------------------
 const COMPLETED_META_KEY = 'completedOrdersMetaV2'
 
 function makeCompletedKeyFromOrder(o) {
@@ -321,11 +294,9 @@ export default function App() {
     selectedOrderId: null,
   })
 
-  // ✅ 分離狀態：乘客/司機各自一套
-  const [passengerUser, setPassengerUser] = useState(null) // {username, role:'passenger'}
-  const [driverUser, setDriverUser] = useState(null) // {username, role:'driver'}
+  const [passengerUser, setPassengerUser] = useState(null)
+  const [driverUser, setDriverUser] = useState(null)
 
-  // UI 仍然需要 currentUser（給 RiderView/DriverView 用），但它是「依 mode 派生」
   const currentUser = useMemo(() => {
     if (mode === 'driver') return driverUser
     return passengerUser
@@ -341,7 +312,6 @@ export default function App() {
   const [simulateVehicles, setSimulateVehicles] = useState(() => readGlobalSimRunning())
   const [driverHotspotPosById, setDriverHotspotPosById] = useState({})
 
-  // no-op props
   const streetFollowOpen = false
   const openStreetFollow = () => {}
   const closeStreetFollow = () => {}
@@ -354,7 +324,6 @@ export default function App() {
     ordersRef.current = orders
   }, [orders])
 
-  // ✅ 用這個避免「回到分頁」時 syncFromUrl 把你導回首頁
   const allowUrlSyncRef = useRef(true)
 
   const openAuth = (returnTo = 'landing', targetRole = null) => {
@@ -382,8 +351,6 @@ export default function App() {
     else setUrlParams({ role: null, auth: false })
   }
 
-  // ✅ URL 不自動導頁到 rider/driver；
-  // ✅ 但「只在 popstate」才會同步（避免分頁回來就被重置）
   useEffect(() => {
     const syncFromUrl = () => {
       if (!allowUrlSyncRef.current) return
@@ -400,7 +367,6 @@ export default function App() {
         return
       }
 
-      // ✅ 沒有 auth=1：一律回 Landing（只在使用者真的按返回/前進時才做）
       setShowAuth(false)
       setShowLanding(true)
       setShowHeatmap(false)
@@ -411,9 +377,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', syncFromUrl)
   }, [])
 
-  // ✅ 切出/切回分頁：不要跳首頁 + 不要讓 sim 重跑
   const getAllOrderSimKeys = useCallback(() => {
-    // 用現在 ordersRef（避免 closure）
     const arr = ordersRef.current || []
     const keys = []
     for (const o of arr) {
@@ -428,7 +392,6 @@ export default function App() {
 
   useEffect(() => {
     const onHidden = () => {
-      // 只要頁面被 background，就暫停 replay 計時
       if (document.visibilityState !== 'hidden') return
       allowUrlSyncRef.current = false
       const keys = getAllOrderSimKeys()
@@ -437,11 +400,9 @@ export default function App() {
 
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return
-      // 回到頁面：恢復 replay 計時（不重置 elapsed）
       const keys = getAllOrderSimKeys()
       for (const k of keys) resumeSim(k)
 
-      // 解除阻擋（延一點點，避免某些瀏覽器回來時觸發奇怪 popstate）
       setTimeout(() => {
         allowUrlSyncRef.current = true
       }, 300)
@@ -589,13 +550,9 @@ export default function App() {
     fetchAll()
     const timer = setInterval(fetchAll, 5000)
     return () => clearInterval(timer)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
-  // ------------------------------
-  // ✅ Auto restore (分離恢復)
-  // ------------------------------
   useEffect(() => {
-    // 若 URL 明確要求 auth=1，就不要干預
     try {
       const params = new URLSearchParams(window.location.search)
       const auth = params.get('auth')
@@ -614,7 +571,6 @@ export default function App() {
       if (du && !driverUser) setDriverUser(du)
       if (did != null && currentDriverId == null) setCurrentDriverId(did)
 
-      // 乘客補齊後端狀態（login / auto register）
       const pCred = readPassengerCred()
       if (pCred?.username && pCred.password) {
         try {
@@ -654,7 +610,6 @@ export default function App() {
         }
       }
 
-      // 司機補齊後端狀態（driver-login 建 driver）
       const dCred = readDriverCred()
       if (dCred?.username) {
         try {
@@ -676,7 +631,6 @@ export default function App() {
     }
 
     boot()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const ordersWithLocations = useMemo(
@@ -735,7 +689,6 @@ export default function App() {
   const createOrder = async (pickup, dropoff, pickupLoc, dropoffLoc, fareInfo, stops = []) => {
     if (!pickup.trim() || !dropoff.trim()) return
 
-    // ✅ 乘客端只看 passengerUser
     if (!passengerUser) {
       openAuth('rider', 'passenger')
       return
@@ -775,7 +728,6 @@ export default function App() {
   }
 
   const acceptOrder = async orderId => {
-    // ✅ 司機端只看 driverUser
     if (!driverUser) {
       openAuth('driver', 'driver')
       return
@@ -912,9 +864,6 @@ export default function App() {
     }
   }
 
-  // ------------------------------
-  // ✅ 登出（只登出目前 mode 的那一端）
-  // ------------------------------
   const logoutCurrentMode = () => {
     if (mode === 'driver') {
       try {
@@ -956,7 +905,6 @@ export default function App() {
     streetFollowOpen,
   }
 
-  // 初始 Landing
   if (showLanding) {
     return (
       <LandingPage
@@ -1050,7 +998,6 @@ export default function App() {
             </span>
           )}
 
-          {/* ✅ 司機端一定有熱點地圖入口：沒登入就導去 driver login */}
           {mode === 'driver' && (
             <button
               className="ghost-btn"
@@ -1067,7 +1014,6 @@ export default function App() {
             </button>
           )}
 
-          {/* ✅ 回首頁：不 reload */}
           <button
             className="header-back-btn"
             type="button"
@@ -1082,7 +1028,6 @@ export default function App() {
             {t(lang, 'backHome')}
           </button>
 
-          {/* ✅ 登出按鍵 */}
           <button
             className="header-back-btn"
             type="button"
