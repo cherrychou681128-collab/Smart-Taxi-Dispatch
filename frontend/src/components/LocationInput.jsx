@@ -1,12 +1,11 @@
-// src/components/LocationInput.jsx
 import { useState } from 'react'
 
 export default function LocationInput({
   label,
   placeholder,
   value,
-  onTextChange,      // (text: string) => void
-  onLocationSelect,  // (loc: { label, lat, lng }) => void
+  onTextChange,
+  onLocationSelect,
 }) {
   const [query, setQuery] = useState(value || '')
   const [options, setOptions] = useState([])
@@ -18,7 +17,6 @@ export default function LocationInput({
     setQuery(q)
     onTextChange?.(q)
 
-    // 太短就不要打 API，順便把候選清掉
     if (!q.trim() || q.trim().length < 2) {
       setOptions([])
       setOpen(false)
@@ -64,7 +62,6 @@ export default function LocationInput({
           if (options.length > 0) setOpen(true)
         }}
         onBlur={() => {
-          // 簡單處理：稍微 delay 一下，讓點擊選項有機會觸發
           setTimeout(() => setOpen(false), 150)
         }}
       />
