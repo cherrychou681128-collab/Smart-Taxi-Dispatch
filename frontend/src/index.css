@@ -1,5 +1,3 @@
-/* ===== 全域基礎樣式 ===== */
-
 *,
 *::before,
 *::after {
@@ -20,16 +18,12 @@ body {
   color: #e5e7eb;
 }
 
-/* ===== App 外框 ===== */
-
 .app-root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #020617;
 }
-
-/* ===== 上方深色列（模式切換 / 語言）===== */
 
 .app-header {
   height: 72px;
@@ -95,8 +89,6 @@ body {
   padding: 4px 10px;
 }
 
-/* ===== 共用按鈕 / 欄位 ===== */
-
 .ghost-btn {
   border-radius: 999px;
   border: 1px solid #4b5563;
@@ -150,8 +142,6 @@ body {
   color: #9ca3af;
   margin-bottom: 4px;
 }
-
-/* ===== 訂單列表共用 ===== */
 
 .orders-block {
   margin-top: 20px;
@@ -218,8 +208,6 @@ body {
   color: #fee2e2;
 }
 
-/* 顯示目前司機/乘客的小框 */
-
 .current-driver-box {
   border-radius: 999px;
   border: 1px solid #4b5563;
@@ -229,14 +217,11 @@ body {
   font-size: 0.9rem;
 }
 
-/* ===== 主內容（地圖 + 側邊卡片）===== */
-
 .app-main {
   flex: 1;
   min-height: 0;
 }
 
-/* 地圖鋪滿，側邊卡片浮在上面（桌機 / 寬螢幕） */
 .map-section {
   position: relative;
   height: calc(100vh - 72px);
@@ -249,16 +234,14 @@ body {
   min-height: 0;
 }
 
-/* Leaflet 地圖一定要有高寬 */
 .map-wrapper .leaflet-container {
   width: 100%;
   height: 100%;
 }
 
-/* 右側 / 底部 浮動面板 */
 .side-panel {
   position: absolute;
-  z-index: 2000; /* ⭐ 確保在地圖上層 */
+  z-index: 2000;
   top: 16px;
   right: 24px;
   width: 420px;
@@ -274,7 +257,6 @@ body {
   overflow-y: auto;
 }
 
-/* 捲軸美化（側邊卡片） */
 .side-panel::-webkit-scrollbar {
   width: 6px;
 }
@@ -286,8 +268,6 @@ body {
   background: transparent;
 }
 
-/* Leaflet emoji icon 微調 */
-
 .taxi-icon,
 .passenger-icon,
 .dest-icon {
@@ -295,8 +275,6 @@ body {
   text-align: center;
   line-height: 24px;
 }
-
-/* ===== 登入 / 註冊頁 ===== */
 
 .auth-main {
   min-height: calc(100vh - 72px);
@@ -386,8 +364,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* ===== LandingPage 用的樣式（首頁 Hero + 司機招募）===== */
-
 .hero-section {
   position: relative;
   background-image: url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1920&auto=format&fit=crop');
@@ -420,8 +396,6 @@ body {
   background-color: #f8f9fa;
   padding: 80px 0;
 }
-
-/* ===== RWD：螢幕變窄時，黑框改放在下方 ===== */
 
 @media (max-width: 900px) {
   .app-header {
@@ -458,8 +432,6 @@ body {
     gap: 6px;
   }
 
-  /* 如果寬度很窄，可以選擇把上面那個 mode-toggle 收起來
-     如果你想一直顯示，就把這一段刪掉 */
   .mode-toggle {
     display: none;
   }
@@ -471,14 +443,13 @@ body {
     max-height: 60%;
   }
 }
-/* 頂部列 */
 .top-bar {
   height: 64px;
   padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #050816; /* 原本深藍底 */
+  background: #050816;
   color: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   z-index: 20;
@@ -494,7 +465,6 @@ body {
   flex: 1;
 }
 
-/* 右邊區塊：使用者資訊 + 回首頁 + 語言 + 模擬 */
 .top-bar-right {
   display: flex;
   align-items: center;
@@ -506,7 +476,6 @@ body {
   opacity: 0.9;
 }
 
-/* 回首頁按鈕 */
 .header-back-btn {
   padding: 6px 14px;
   border-radius: 999px;
@@ -523,7 +492,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* 語言選單 */
 .lang-switch {
   display: flex;
   align-items: center;
@@ -540,7 +508,6 @@ body {
   font-size: 13px;
 }
 
-/* 模擬按鈕 */
 .sim-toggle-btn {
   padding: 6px 12px;
   border-radius: 999px;
@@ -558,7 +525,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* 如果你原本還有 role-switch 這種 class，直接隱藏掉 */
 .role-switch,
 .role-toggle,
 .role-tabs {
