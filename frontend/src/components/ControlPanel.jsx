@@ -1,4 +1,3 @@
-// src/components/ControlPanel.jsx
 import { useState } from 'react'
 import OrderList from './OrderList.jsx'
 
