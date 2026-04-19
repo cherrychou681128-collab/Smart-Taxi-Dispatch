@@ -1,4 +1,3 @@
-// src/components/OrderList.jsx
 import React, { useMemo } from 'react'
 import { t } from '../i18n'
 
@@ -64,8 +63,8 @@ export default function OrderList({
   orders,
   drivers,
   isDriverView,
-  currentDriverId, // 司機端會傳
-  onAcceptOrder, // 司機端會傳
+  currentDriverId,
+  onAcceptOrder,
   selectedOrderId,
   completedOrderIds,
   onSelectOrder,
@@ -94,7 +93,6 @@ export default function OrderList({
           const id = o?.id
           const isSelected = id != null && selectedOrderId === id
 
-          // ✅ 只信 completedOrderIds：避免後端狀態亂寫
           const done = Boolean(completedOrderIds?.has?.(id))
 
           const rawStatus = normalizeStatus(o?.status)
@@ -109,7 +107,6 @@ export default function OrderList({
               ? (driverMap.get(driverId)?.name || driverMap.get(driverId)?.username || '')
               : ''
 
-          // ✅ 司機端：pending + 未指派司機 + 有接單 callback => 顯示「接單」
           const canAccept =
             Boolean(isDriverView) &&
             !done &&
@@ -160,7 +157,6 @@ export default function OrderList({
 
                   {o?.vehicleType ? <span className="ub-chip ub-chip--ghost">{o.vehicleType}</span> : null}
 
-                  {/* 額外資訊可選：顯示司機名（乘客端也可看得到） */}
                   {driverName ? <span className="ub-chip ub-chip--ghost">{driverName}</span> : null}
                 </div>
 
@@ -176,7 +172,6 @@ export default function OrderList({
                   </div>
                 </div>
 
-                {/* ✅ 停靠點（新增） */}
                 {visibleStops.length > 0 && (
                   <div className="ub-route__stops">
                     <div className="ub-route__stopsLabel">停靠點</div>
