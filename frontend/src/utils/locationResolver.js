@@ -1,5 +1,3 @@
-// 根據文字關鍵字，回傳紐約的經緯度
-// 之後你要再加地點，只要在 places 裡加一個物件就好
 const places = [
   {
     name: 'Times Square',
@@ -49,6 +47,5 @@ export function resolveLocation(text) {
     }
   }
 
-  // 找不到關鍵字：預設丟在 Times Square 附近
   return { lat: 40.758, lng: -73.9855, name: text }
 }
