@@ -2,7 +2,15 @@
 # Intelligent Taxi Dispatch System
 
 ## 📌 Project Overview
-This project presents an intelligent taxi dispatch and routing system designed to optimize fleet management in New York City. By leveraging a hybrid machine learning approach, the system combines **ConvLSTM** for capturing complex spatial-temporal patterns in ride-hailing demand and **XGBoost** for evaluating localized reward scores based on urban features (e.g., 311 service requests). The ultimate goal is to proactively guide drivers to high-demand areas, reducing passenger wait times and maximizing driver efficiency.
+This project is a smart taxi dispatch system built for New York City. Instead of having drivers guess where their next passenger will be, this system uses AI to guide them to the right place at the right time.
+
+We use two main models to make this happen:
+
+ConvLSTM: This model captures complex spatial-temporal patterns in past data, helping us exactly predict when and where the highest ride demand will happen.
+
+XGBoost: This looks at city data (like 311 service requests) to figure out how "valuable" or "profitable" a specific area is for drivers.
+
+The ultimate goal is send drivers to busy areas before passengers even request a ride. This cuts down wait times for passengers and helps drivers earn money more efficiently.
 
 ## 💾 Dataset & Large Files Download
 Due to GitHub's strict file size limit (100MB), the complete NYC road network file and the full 311 dataset are not directly included in this repository. 
