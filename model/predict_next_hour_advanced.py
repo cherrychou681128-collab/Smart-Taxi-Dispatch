@@ -1,11 +1,12 @@
-from pathlib import Path
-import pandas as pd
+from pathlib import Path#處理路徑
+import pandas as pd#資料表處理
 import numpy as np
 import xgboost as xgb
-import folium
+import folium#地圖
 from folium.plugins import HeatMap
 from pyproj import Transformer
 
+# === 資料夾設定 ===
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 MODEL_DIR = BASE_DIR / "model"
@@ -20,9 +21,12 @@ print("模型：", model_path)
 print("每小時資料：", hourly_path)
 print("centroid：", centroid_path)
 
+# 1. 載入模型
 model = xgb.Booster()
 model.load_model(str(model_path))
+print("✅ 模型載入完成")
 
+# 2. 讀取歷史每小時資料
 df = pd.read_parquet(hourly_path)
 df["pickup_hour"] = pd.to_datetime(df["pickup_hour"])
 
@@ -31,6 +35,7 @@ next_hour = last_hour + pd.Timedelta(hours=1)
 print("最後資料時間：", last_hour)
 print("預測時間（下一小時）：", next_hour)
 
+# 3. 為「下一小時」建立特徵
 rows = []
 for loc_id, g in df.groupby("PULocationID"):
     g = g.sort_values("pickup_hour")
@@ -38,7 +43,7 @@ for loc_id, g in df.groupby("PULocationID"):
 
     y = g["rides"].values
     if len(y) < 24:
-        continue
+        continue  # 不足 24 小時，跳過
 
     lag_1 = float(y[-1])
     lag_24 = float(y[-24])
@@ -62,9 +67,9 @@ for loc_id, g in df.groupby("PULocationID"):
     })
 
 df_feat = pd.DataFrame(rows)
-print("可預測的地區數：", len(df_feat))
+print("可預測的地區數量：", len(df_feat))
 if df_feat.empty:
-    raise RuntimeError("沒有地區有足夠資料可預測")
+    raise RuntimeError("沒有任何地區有足夠資料可預測")
 
 feature_cols = [
     "PULocationID",
@@ -81,12 +86,15 @@ dtest = xgb.DMatrix(df_feat[feature_cols])
 pred = model.predict(dtest, validate_features=False)
 df_feat["pred_rides"] = pred
 
+# 4. 輸出預測 CSV 到 outputs/
 csv_path = OUT_DIR / "pred_next_hour_advanced.csv"
 df_feat.to_csv(csv_path, index=False, encoding="utf-8-sig")
-print("下一小時預測輸出：", csv_path)
+print("✅ 下一小時預測輸出：", csv_path)
 
+# 5. 合併 centroid + 座標轉換 → 畫熱力圖
 df_cent = pd.read_csv(centroid_path)
 
+# EPSG:2263 → WGS84(EPSG:4326)
 transformer = Transformer.from_crs("EPSG:2263", "EPSG:4326", always_xy=True)
 
 df_merged = df_feat.merge(
@@ -110,4 +118,4 @@ HeatMap(heat_data, radius=15, blur=10).add_to(m)
 
 html_path = OUT_DIR / "pred_next_hour_advanced_heatmap.html"
 m.save(html_path)
-print("熱力圖輸出：", html_path)
+print("✅ 熱力圖輸出：", html_path)
