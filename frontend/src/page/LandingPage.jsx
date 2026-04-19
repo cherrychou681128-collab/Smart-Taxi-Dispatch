@@ -1,4 +1,3 @@
-// src/LandingPage.jsx
 import { useEffect, useState } from 'react'
 import './LandingPage.css'
 import { t, languages } from './i18n'
@@ -10,7 +9,7 @@ export default function LandingPage({
   onDriverClick,
   onAuthClick,
 }) {
-  // ====== Landing 輸入：上下車 + 建議 + 座標 ======
+
   const [pickupText, setPickupText] = useState('')
   const [dropoffText, setDropoffText] = useState('')
 
@@ -23,7 +22,6 @@ export default function LandingPage({
   const [pickupLocked, setPickupLocked] = useState(false)
   const [dropoffLocked, setDropoffLocked] = useState(false)
 
-  // 上車建議
   useEffect(() => {
     if (pickupLocked) {
       setPickupSuggestions([])
@@ -44,7 +42,6 @@ export default function LandingPage({
         const data = await res.json()
         setPickupSuggestions(Array.isArray(data) ? data : [])
       } catch {
-        // ignore
       }
     }, 400)
 
@@ -54,7 +51,6 @@ export default function LandingPage({
     }
   }, [pickupText, pickupLocked])
 
-  // 下車建議
   useEffect(() => {
     if (dropoffLocked) {
       setDropoffSuggestions([])
@@ -75,7 +71,6 @@ export default function LandingPage({
         const data = await res.json()
         setDropoffSuggestions(Array.isArray(data) ? data : [])
       } catch {
-        // ignore
       }
     }, 400)
 
@@ -111,7 +106,6 @@ export default function LandingPage({
 
   return (
     <div id="top" className="landing-root">
-      {/* 導覽列 */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div className="container">
           <a className="navbar-brand fw-bold" href="#top">
@@ -168,7 +162,6 @@ export default function LandingPage({
               </li>
             </ul>
 
-            {/* 語言切換 */}
             <div className="ms-3 d-flex align-items-center text-white">
               <span className="small me-2">{t(lang, 'language')}：</span>
               <select
@@ -188,7 +181,6 @@ export default function LandingPage({
         </div>
       </nav>
 
-      {/* 乘客 hero 區塊 */}
       <section className="hero-section" id="passenger">
         <div className="hero-overlay" />
         <div className="container hero-content">
@@ -203,7 +195,6 @@ export default function LandingPage({
                 <h3 className="fw-bold mb-4">{t(lang, 'landingHeroWhereTo')}</h3>
 
                 <form>
-                  {/* 上車 */}
                   <div className="mb-3 position-relative">
                     <label className="form-label text-muted small">
                       {t(lang, 'landingHeroPickupLabel')}
@@ -258,7 +249,6 @@ export default function LandingPage({
                     )}
                   </div>
 
-                  {/* 下車 */}
                   <div className="mb-3 position-relative">
                     <label className="form-label text-muted small">
                       {t(lang, 'landingHeroDropoffLabel')}
@@ -313,7 +303,6 @@ export default function LandingPage({
                     )}
                   </div>
 
-                  {/* 查看價格與車輛 → 直接進入乘客端（並帶草稿） */}
                   <button
                     type="button"
                     className="btn btn-dark w-100 btn-lg py-3 fw-bold"
@@ -328,7 +317,6 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* 以下原樣保留（你的流程圖、司機招募、footer 不動） */}
       <section className="how-it-works-section py-5 bg-white">
         <div className="container text-center">
           <div className="mb-5">
