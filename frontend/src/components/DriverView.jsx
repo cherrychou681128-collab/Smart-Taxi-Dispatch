@@ -1,11 +1,9 @@
-//driver
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import MapView from '../components/MapView.jsx'
 import OrderList from '../components/OrderList.jsx'
 import { t } from '../i18n'
 import { apiFetch } from '../apiBase.js'
 
-// --- 工具函數 ---
 function normalizeVehicleType(value) {
   if (value == null) return null
   const s = String(value).trim().toUpperCase()
@@ -86,7 +84,6 @@ async function mapLimit(items, limit, fn) {
   return results
 }
 
-// ✅ 每位司機獨立的定位鎖
 function driverLocLockKey(driverId) {
   return `driverLocConfirmed:${driverId ?? 'na'}`
 }
@@ -122,7 +119,7 @@ function readPersistedDriverLoc(driverId) {
 
 const DRIVER_LOC_TS_PREFIX = 'driverLocTs:'
 const DRIVER_LAST_LOGIN_DRIVER_KEY = 'driverLastLoginDriverId'
-const DRIVER_LOC_TTL_MS = 60 * 60 * 1000 // 1小時；你要 12 小時就改成 12 * 60 * 60 * 1000
+const DRIVER_LOC_TTL_MS = 60 * 60 * 1000 
 
 function driverLocTsKey(driverId) {
   return `${DRIVER_LOC_TS_PREFIX}${driverId ?? 'na'}`
@@ -261,9 +258,6 @@ export default function DriverView({
     setSelectedOrderId(null)
   }, [effectiveDriverId, isLoggedIn])
 
-  // ✅ 修正：
-  // 第一次點地圖定位才需要上鎖
-  // 之後完成訂單 / 行程同步更新位置，不能被 locConfirmed 擋掉
   const handleDriverLocationChange = useCallback(
     p => {
       if (!driverReady) return
@@ -281,16 +275,12 @@ onDriverLocationChange?.(p)
     [onDriverLocationChange, effectiveDriverId, locConfirmed, driverReady]
   )
 
-  // ✅ 新增：重設定位（不影響原流程，純 debug / UX）
   const resetMyLocation = useCallback(() => {
   if (effectiveDriverId == null) return
   clearDriverLocationState(effectiveDriverId)
   setLocConfirmed(false)
 }, [effectiveDriverId])
 
-  // ✅ 修正：
-  // 每次顯示司機位置優先吃 localStorage 的最新 driverLoc
-  // 這樣完成訂單後的新終點就會直接成為下一次起點
   const myDriverLoc = useMemo(() => {
     if (!locConfirmed || effectiveDriverId == null) return null
 
