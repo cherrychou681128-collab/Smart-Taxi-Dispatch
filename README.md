@@ -1,4 +1,4 @@
-# Smart-Taxi-Dispatch: End-to-End MLOps & Full-Stack Architecture
+# Spatiotemporal AI Dispatcher: An End-to-End Urban Mobility System
 
 ## 📌 Project Overview
 This project is a smart taxi dispatch system built for New York City. Instead of having drivers guess where their next passenger will be, this system uses AI to guide them to the right place at the right time.
