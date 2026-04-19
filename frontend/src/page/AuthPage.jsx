@@ -1,22 +1,19 @@
-// src/views/AuthPage.jsx
 import { useEffect, useState } from 'react'
 import { t } from '../i18n'
 import './AuthPage.css'
 
 export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRole = 'passenger' }) {
-  const [tab, setTab] = useState('login') // 'login' | 'register'
+  const [tab, setTab] = useState('login')
 
-  // ✅ role：登入/註冊都使用（登入要決定打哪個 endpoint）
   const [role, setRole] = useState(defaultRole === 'driver' ? 'driver' : 'passenger')
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [carType, setCarType] = useState('') // driver 註冊用
+  const [carType, setCarType] = useState('')
 
-  const [error, setError] = useState('') // 存「錯誤 key」
+  const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  // ✅ 如果 App 依 URL 推了 defaultRole（例如 /?role=driver&auth=1），同步到表單
   useEffect(() => {
     if (defaultRole === 'driver') setRole('driver')
     else if (defaultRole === 'passenger') setRole('passenger')
@@ -25,16 +22,13 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
   const mapLoginErrorToKey = msg => {
     const s = String(msg || '').trim()
 
-    // 後端原生字串（你的 FastAPI）
-    if (s === 'invalid credentials') return 'errorWrongPassword' // 或你想用 errorInvalidCredentials
+    if (s === 'invalid credentials') return 'errorWrongPassword'
     if (s === 'not a passenger account') return 'errorNotPassengerAccount'
     if (s === 'not a driver account') return 'errorNotDriverAccount'
 
-    // 兼容你舊的 key/文字
     if (s === 'auth_loginFailed') return 'errorWrongPassword'
     if (s === 'loginFailed') return 'errorUserNotFound'
 
-    // 若後端直接回我們的 key（或你自己丟回來）
     return s || 'loginFailed'
   }
 
@@ -53,7 +47,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
 
     try {
       if (tab === 'login') {
-        // ✅ 登入：把 role 一起送回 App，讓 App 不用猜 endpoint
         const result = (await onLogin?.({ username, password, role })) || { ok: false }
 
         if (!result.ok) {
@@ -62,7 +55,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
         return
       }
 
-      // ===== 註冊 =====
       if (!username || !password) {
         setError('errorMissingFields')
         return
@@ -92,7 +84,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
   return (
     <div className="auth-page-root">
       <div className="auth-card">
-        {/* 標題列 */}
         <div className="auth-header">
           <h2 className="auth-title">{t(lang, 'authTitle')}</h2>
           {onBack && (
@@ -102,7 +93,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
           )}
         </div>
 
-        {/* 登入 / 註冊 tab */}
         <div className="auth-tabs">
           <button
             type="button"
@@ -126,11 +116,9 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
           </button>
         </div>
 
-        {/* 錯誤訊息（key → i18n） */}
         {error && <div className="auth-error-banner">{t(lang, error)}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {/* ✅ 身分：登入/註冊都顯示，避免 App 猜錯 endpoint */}
           <div className="auth-field">
             <label className="auth-label">{t(lang, 'roleLabel')}</label>
             <div className="auth-radio-group">
@@ -158,7 +146,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
             </div>
           </div>
 
-          {/* ✅ 只有「註冊 + 司機」才需要車種 */}
           {tab === 'register' && role === 'driver' && (
             <div className="auth-field">
               <label className="auth-label">{t(lang, 'carTypeLabel')}</label>
@@ -171,7 +158,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
             </div>
           )}
 
-          {/* 帳號 */}
           <div className="auth-field">
             <label className="auth-label">{t(lang, 'usernameLabel')}</label>
             <input
@@ -183,7 +169,6 @@ export default function AuthPage({ lang, onBack, onRegister, onLogin, defaultRol
             />
           </div>
 
-          {/* 密碼 */}
           <div className="auth-field">
             <label className="auth-label">{t(lang, 'passwordLabel')}</label>
             <input
