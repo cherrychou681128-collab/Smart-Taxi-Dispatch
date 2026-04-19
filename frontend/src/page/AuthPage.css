@@ -1,0 +1,239 @@
+/* src/views/AuthPage.css */
+
+/* ✅ 1) 先把全域黑邊最常見來源：body 預設 margin 清掉，並確保背景一致 */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  background: #050816;
+}
+
+/* ✅ 2) Auth 畫面用 fixed 鋪滿整個 viewport，避免四周露出不一致背景形成黑邊 */
+.auth-page-root {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 你現在的深色背景加一點漸層，視覺比較不會像「邊緣黑塊」 */
+  background: radial-gradient(
+      1200px 800px at 50% 30%,
+      rgba(34, 197, 94, 0.10),
+      rgba(5, 8, 22, 1) 60%
+    ),
+    #050816;
+
+  color: #ffffff;
+  overflow: hidden;
+}
+
+/* 卡片 */
+.auth-card {
+  width: calc(100% - 32px);
+  max-width: 420px;
+  background: rgba(17, 24, 39, 0.92);
+  border-radius: 18px;
+  padding: 24px 24px 32px;
+
+  /* 邊框 + 陰影讓卡片更乾淨 */
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+/* 標題列 */
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.auth-title {
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+}
+
+.auth-back-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.auth-back-btn:hover {
+  color: #e5e7eb;
+}
+
+/* ✅ Tabs：登入/註冊 */
+.auth-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+
+  /* 外框做成膠囊 */
+  border-radius: 999px;
+  padding: 6px;
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+
+  padding: 10px 0;
+  font-size: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.auth-tab:hover {
+  color: #e5e7eb;
+}
+
+/* ✅ 你要的：當在登入頁 → 「登入」整顆綠底；在註冊頁 → 「註冊」整顆綠底 */
+.auth-tab-active {
+  background: #22c55e;
+  color: #020617;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+}
+
+/* 錯誤訊息 */
+.auth-error-banner {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: #b91c1c;
+  color: #fef2f2;
+  border-radius: 12px;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* 表單 */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-label {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.auth-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.95);
+  background: rgba(2, 6, 23, 0.9);
+  padding: 11px 14px;
+  color: #e5e7eb;
+  outline: none;
+
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.auth-input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+.auth-radio-group {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+/* 送出按鈕 */
+.auth-submit-btn {
+  margin-top: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 0;
+  background: #22c55e;
+  color: #020617;
+  font-weight: 800;
+  cursor: pointer;
+
+  transition: transform 120ms ease, filter 140ms ease;
+}
+
+.auth-submit-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+/* ===== Tabs override (put at END of AuthPage.css) ===== */
+
+/* 外框：不要綠暈染，不要黑底發光，只留乾淨框線 */
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  margin-bottom: 16px;
+
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden; /* 讓 active 綠底完全被膠囊裁切 */
+}
+
+/* 每顆 tab 都是獨立膠囊的一半 */
+.auth-tab {
+  flex: 1;
+  border: 0;
+  border-radius: 0;          /* 交給外層裁切 */
+  background: transparent;   /* 未選中：透明 */
+  color: rgba(255, 255, 255, 0.75);
+
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: background 150ms ease, color 150ms ease;
+}
+
+/* hover 只是字亮一點，不要底色暈染 */
+.auth-tab:hover {
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ✅ 重點：被選中的那顆「整顆綠底」 */
+.auth-tab.auth-tab-active {
+  background: #22c55e !important; /* 強制蓋過其他樣式 */
+  color: #07150c !important;      /* 深色字更像你想要的 */
+}
+
+/* 可選：按下時不要跑版 */
+.auth-tab:active {
+  transform: none;
+}
