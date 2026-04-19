@@ -1,4 +1,3 @@
-//rider
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import MapView from '../components/MapView.jsx'
 import OrderList from '../components/OrderList.jsx'
@@ -244,7 +243,6 @@ const syncedActivePassengerOrder = useMemo(() => {
 useEffect(() => {
   if (composeMode) return
 
-  // 只要有司機已接單 / active order，乘客端強制同步那張
   if (syncedActivePassengerOrder?.id != null) {
     setSelectedOrderId(syncedActivePassengerOrder.id)
     userManuallySelectedOrder.current = false
@@ -752,24 +750,18 @@ const ordersForMap = useMemo(() => {
     resetComposerInputs()
   }
 
-  // ✅ [修正重點] 核心邏輯：嚴格過濾司機
-  // 1. 只有當前「顯示在畫面上」的訂單（ordersForMap）所對應的司機才顯示
-  // 2. 或是與當前使用者相關且「非已完成狀態」的司機才顯示
   const visibleDrivers = useMemo(() => {
     if (!currentUser || !drivers || !drivers.length) return []
 
-    // 取得當前畫面上正在活躍的所有訂單 ID (包含預覽單除外)
     const activeOnMapIds = new Set(ordersForMap.map(o => o.id));
 
     return drivers.filter(d => {
-      // 找出這個司機目前正在服務的訂單
       const serviceOrder = orders.find(o => {
           const isMatched = (String(o.driverId) === String(d.id) || String(o.assignedDriverId) === String(d.id));
           const isMine = o.customer === currentUser.username;
           const isNotCompleted = !completedOrderIds.has(o.id);
           const isActiveOnMap = activeOnMapIds.has(o.id);
           
-          // 狀態過濾：必須是進行中的狀態
           const s = String(o.status || '').toLowerCase();
           const isActiveStatus = ['assigned', 'accepted', 'en_route', 'enroute', 'picked_up', 'in_progress', 'on_trip', 'ongoing'].includes(s);
 
