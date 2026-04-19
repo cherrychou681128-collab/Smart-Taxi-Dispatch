@@ -1,5 +1,3 @@
-// src/views/DriverPage.jsx (或你實際檔名)
-// ⚠️ 這支是你「司機派車建議」頁
 import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   MapContainer,
@@ -12,16 +10,14 @@ import {
 } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { apiFetch } from './apiBase.js' // ✅ 改：統一用你的 apiFetch（你也可以換成相對路徑）
+import { apiFetch } from './apiBase.js'
 import { taxiIcon, passengerIcon, dropoffIcon } from './mapIcons'
 
-// ====== 設定 ======
 const DEFAULT_CENTER = [40.758, -73.9855]
 const ZOOM_LEVEL = 11
 const STEP_MS = 60
 const FALLBACK_SPEED_KPH = 28
 
-// ====== Helper Functions ======
 function sameId(a, b) {
   const A = Number(a)
   const B = Number(b)
@@ -52,7 +48,6 @@ function getOrderKey(order) {
   return `${id}::${String(createdAt)}`
 }
 
-// ====== SVG 車輛圖標 ======
 function makeTaxiIcon() {
   const svg = `
     <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,7 +72,6 @@ function makeTaxiIcon() {
   return L.divIcon({ className: '', html, iconSize: [44, 44], iconAnchor: [22, 22] })
 }
 
-// ====== 數學運算 ======
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -125,7 +119,6 @@ function positionAtDistance(coords, cum, d) {
   return { lat: lat0 + (lat1 - lat0) * ratio, lng: lng0 + (lng1 - lng0) * ratio }
 }
 
-// ====== OSRM ======
 async function getRoute(fromLat, fromLon, toLat, toLon) {
   const url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=full&geometries=geojson`
   try {
@@ -142,7 +135,6 @@ async function getRoute(fromLat, fromLon, toLat, toLon) {
   }
 }
 
-// ====== Simulation (localStorage) ======
 function simKey(k) {
   return `sim:${k}`
 }
@@ -169,7 +161,6 @@ function computeElapsedMs(k) {
   return { elapsedMs: total }
 }
 
-// ====== 311 顏色 ======
 function colorByFinalScore(s) {
   const v = Number(s ?? 0)
   if (v >= 80) return '#d50000'
@@ -195,7 +186,6 @@ function computeRadiusScaler(zones) {
   }
 }
 
-// ====== CarRuntimeLayer (接單時移動車輛) ======
 function CarRuntimeLayer({ order, routeCoords, simulateVehicles, driverPos }) {
   const map = useMap()
   const markerRef = useRef(null)
@@ -277,7 +267,6 @@ function CarRuntimeLayer({ order, routeCoords, simulateVehicles, driverPos }) {
   return null
 }
 
-// ====== RecommendationCarLayer ======
 function RecommendationCarLayer({ playRouteCoords, playingKey }) {
   const map = useMap()
   const markerRef = useRef(null)
@@ -325,7 +314,6 @@ function RecommendationCarLayer({ playRouteCoords, playingKey }) {
   return null
 }
 
-// ====== AutoRecommendController ======
 function AutoRecommendController({
   driverPos,
   zones,
@@ -397,7 +385,6 @@ function AutoRecommendController({
   return null
 }
 
-// ====== 主頁面 ======
 export default function DriverPage({ onBack, driverId, drivers, orders, simulateVehicles }) {
   const [zones, setZones] = useState([])
   const [driverPos, setDriverPos] = useState(null)
@@ -408,7 +395,6 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
   const [playRoute, setPlayRoute] = useState(null)
   const [playingKey, setPlayingKey] = useState('init')
 
-  // ✅ 熱點載入：res.ok + retry（避免 model not ready 時 zones 永遠空）
   useEffect(() => {
     let cancelled = false
     let timer = null
@@ -455,13 +441,11 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
     }
   }, [])
 
-  // 2. 找出我的活躍訂單
   const myActiveOrder = useMemo(() => {
     if (!driverId || !orders) return null
     return orders.find((o) => sameId(getOrderDriverId(o), driverId) && isActiveStatus(o.status))
   }, [orders, driverId])
 
-  // 4. 找出我的司機位置
   const myStaticPos = useMemo(() => {
     const me = drivers?.find((d) => sameId(d.id, driverId))
     if (me && Number.isFinite(Number(me.lat)) && Number.isFinite(Number(me.lng))) {
@@ -470,7 +454,6 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
     return null
   }, [drivers, driverId])
 
-  // ✅ driverPos 來源：drivers 裡的定位
   useEffect(() => {
     if (!myStaticPos) return
     setDriverPos((prev) => {
@@ -482,7 +465,6 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
     })
   }, [myStaticPos])
 
-  // 3. 計算我的活躍訂單路線：✅ 改成 driver -> pickup -> dropoff（避免 pickup 冒出一台）
   const [myOrderRoute, setMyOrderRoute] = useState(null)
   useEffect(() => {
     let cancelled = false
@@ -503,8 +485,8 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
       const startLat = Number.isFinite(Number(s?.lat)) ? s.lat : p.lat
       const startLng = Number.isFinite(Number(s?.lng)) ? s.lng : p.lng
 
-      const r1 = await getRoute(startLat, startLng, p.lat, p.lng) // driver -> pickup
-      const r2 = await getRoute(p.lat, p.lng, d.lat, d.lng)       // pickup -> dropoff
+      const r1 = await getRoute(startLat, startLng, p.lat, p.lng)
+      const r2 = await getRoute(p.lat, p.lng, d.lat, d.lng)
 
       const c1 = r1.coords || []
       const c2 = r2.coords || []
@@ -518,10 +500,8 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
     return () => { cancelled = true }
   }, [myActiveOrder, myStaticPos])
 
-  // 5. 顯示路線
   const showRoute = (routeCoords) => setActiveRoute(routeCoords)
 
-  // 6. 點卡片：顯示路線 + 播放小車
   const playToZone = (routeCoords) => {
     if (!routeCoords || routeCoords.length < 2) return
     setActiveRoute(routeCoords)
@@ -547,7 +527,6 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
             setPlayingKey={setPlayingKey}
           />
 
-          {/* 熱點圈圈 */}
           {zones.map((z, i) => {
             const fs = Number(z.final_score ?? 0)
             const color = colorByFinalScore(fs)
@@ -573,12 +552,10 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
             )
           })}
 
-          {/* ✅ 修正：沒接單時才畫靜態車；接單後只留 CarRuntimeLayer 那台 */}
           {myStaticPos && !myActiveOrder && (
             <Marker position={[myStaticPos.lat, myStaticPos.lng]} icon={makeTaxiIcon()} opacity={0.95} />
           )}
-
-          {/* 接單時會動的車 */}
+          
           {myActiveOrder && myOrderRoute && (
             <CarRuntimeLayer
               order={myActiveOrder}
@@ -588,7 +565,6 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
             />
           )}
 
-          {/* 3 條推薦路線 */}
           {routes3?.length
             ? routes3.map((coords, idx) => {
                 if (!coords || coords.length < 2) return null
@@ -603,10 +579,8 @@ export default function DriverPage({ onBack, driverId, drivers, orders, simulate
               })
             : null}
 
-          {/* 只顯示單一路線 */}
           {activeRoute && <Polyline positions={activeRoute} pathOptions={{ color: 'blue', weight: 5, opacity: 0.8 }} />}
 
-          {/* 推薦小車動畫 */}
           {playRoute && <RecommendationCarLayer playRouteCoords={playRoute} playingKey={playingKey} />}
         </MapContainer>
 
