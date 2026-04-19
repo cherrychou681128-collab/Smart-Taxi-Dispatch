@@ -1,0 +1,29 @@
+{
+  "name": "taxi-dispatch-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "leaflet": "^1.9.4",
+    "node-fetch": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0"
+  }
+}
