@@ -1,6 +1,5 @@
 @import './index.css';
 
-/* ===== Autocomplete（白底黑字，唯一版本，避免互相覆蓋）===== */
 .autocomplete-wrapper { position: relative; }
 
 .autocomplete-dropdown{
@@ -30,7 +29,6 @@
   background: rgba(0,0,0,0.06);
 }
 
-/* ===== 價格選項區塊 ===== */
 .fare-panel {
   margin-top: 16px;
   padding: 16px 20px;
@@ -81,7 +79,6 @@
   box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.7);
 }
 
-/* ===== 地圖 marker 樣式 ===== */
 .stop-icon {
   background: #00b894;
   border-radius: 50%;
@@ -114,10 +111,6 @@
   border: 2px solid #fff;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
-
-/* ================================
-   Uber-ish Order List (App.css)
-   ================================ */
 
 .ub-orders {
   margin-top: 10px;
@@ -159,7 +152,6 @@
   padding: 10px 2px;
 }
 
-/* Card */
 .ub-orderCard {
   width: 100%;
   text-align: left;
@@ -185,7 +177,6 @@
   opacity: .92;
 }
 
-/* Top row */
 .ub-orderCard__top {
   display: flex;
   align-items: center;
@@ -206,7 +197,6 @@
   color: rgba(0,0,0,.55);
 }
 
-/* Chips */
 .ub-chip {
   display: inline-flex;
   align-items: center;
@@ -252,7 +242,6 @@
   color: #7f1d1d;
 }
 
-/* Accept action chip */
 .ub-chip--action {
   background: #000;
   color: #fff;
@@ -264,7 +253,6 @@
   cursor: not-allowed;
 }
 
-/* Route block */
 .ub-route {
   margin-top: 10px;
   border-radius: 16px;
@@ -311,7 +299,6 @@
   line-height: 1.25;
 }
 
-/* Meta grid */
 .ub-meta {
   margin-top: 10px;
   display: grid;
@@ -344,12 +331,10 @@
   font-size: 12px;
 }
 
-/* ===== Stops (single, unified version: collapsible + compatible) ===== */
-
 .ub-route__stops {
   margin-top: 12px;
   width: 100%;
-  padding-top: 10px;                 /* ✅ 保留舊版的分隔感 */
+  padding-top: 10px;
   border-top: 1px dashed rgba(0,0,0,.12);
 }
 
@@ -362,7 +347,7 @@
 }
 
 .ub-route__stopsLabel {
-  font-size: 13px;                    /* ✅ 只留一份 */
+  font-size: 13px;
   font-weight: 900;
   opacity: 0.75;
   white-space: nowrap;
@@ -383,7 +368,6 @@
   text-decoration: underline;
 }
 
-/* 若你有用到「未展開時的文字預覽」：保留這個 class，不會跟 collapsible 打架 */
 .ub-route__stopsText {
   font-weight: 900;
   font-size: 12.5px;
@@ -396,7 +380,6 @@
   overflow: hidden;
 }
 
-/* Expanded stops list */
 .ub-stops {
   margin-top: 10px;
   width: 100%;
@@ -410,7 +393,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  min-width: 0; /* ✅ 讓文字在卡片內正確縮排不溢出 */
+  min-width: 0;
 }
 
 .ub-stopBadge {
@@ -435,16 +418,15 @@
   font-size: 18px;
   line-height: 1.25;
   word-break: break-word;
-  overflow-wrap: anywhere; /* ✅ 長地址也能在卡片寬度內換行 */
+  overflow-wrap: anywhere;
 }
 
 .ub-stops__more {
   font-size: 13px;
   opacity: 0.75;
-  padding-left: 38px; /* ✅ 對齊 badge 後的文字位置 */
+  padding-left: 38px;
 }
 
-/* ===== Toasts (補齊 success/warn/danger，避免 DriverView 用到卻沒樣式) ===== */
 .ub-toast{
   margin-top: 10px;
   padding: 10px 12px;
