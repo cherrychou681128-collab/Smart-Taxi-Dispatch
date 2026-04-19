@@ -1,5 +1,3 @@
-// src/i18n.js  (不能刪!!!)
-
 const messages = {
   zh: {
     appTitle: 'NY Taxi Demo',
@@ -56,7 +54,6 @@ const messages = {
     attachDriverFailed: '無法建立司機車輛，請稍後再試。',
     driverVehicleNotAttached: '尚未綁定司機車輛，請重新登入司機或稍後再試。',
 
-    // Auth
     authTitle: 'SmartDispatch 帳號',
     login: '登入',
     register: '註冊',
@@ -76,23 +73,18 @@ const messages = {
     loginFailed: '登入失敗',
     registerFailed: '註冊失敗',
 
-    // 舊 key 相容
     auth_loginFailed: '密碼錯誤！',
     auth_registerFailed: '此帳號名稱已被使用！',
 
-    // Auth error mapping（照你指定的文字）
-    // 1. 還沒註冊過 → 請先登入（你如果想改成「請先註冊」只要改這一行即可）
     errorUsernameTaken: '此帳號名稱已存在，請重新輸入',
     errorMissingFields: '請輸入完整的帳號與密碼。',
     errorUserNotFound: '請先註冊',
     errorWrongPassword: '密碼錯誤',
 
-    // Landing page nav
     landingNavPassenger: '我是乘客',
     landingNavDriver: '我是司機',
     landingNavAuth: '登入 / 註冊',
 
-    // Landing hero
     landingHeroTitle: '計程車派遣系統',
     landingHeroSubtitle: '利用大數據分析，讓您不浪費時間等待。',
     landingHeroWhereTo: '去哪裡？',
@@ -104,7 +96,6 @@ const messages = {
     landingHeroPriceExample: '預估金額：$150 - $180',
     landingHeroCta: '查看價格與車輛',
 
-    // Landing how-it-works
     landingHowTitleTag: 'Simple Steps',
     landingHowTitle: '如何使用 SmartDispatch？',
     landingHowSubtitle: '簡單三步驟，體驗 AI 賦能的紐約出行服務',
@@ -119,7 +110,6 @@ const messages = {
       '即時追蹤司機位置，享受安全舒適的旅程，並在抵達後輕鬆支付。',
     landingHowCta: '立即開始叫車',
 
-    // Landing driver section
     landingDriverBadge: '司機專屬',
     landingDriverTitleLine1: '有預測需求指數',
     landingDriverTitleLine2: '不讓你白跑一趟。',
@@ -132,13 +122,11 @@ const messages = {
       '我們會為每條路線打分數，跟著高分走，空車率降低 30%。',
     landingDriverCta: '加入司機行列',
 
-    // Landing footer
     landingFooterTitle: '立即體驗智慧派遣',
     landingFooterIos: '🍎 iOS 下載',
     landingFooterAndroid: '🤖 Android 下載',
     landingFooterCopyright:
       '© 2025 SmartDispatch Project. Department of Computer Science.',
-      // OrderList (new)
 ordersCountSuffix: '筆',
 orderIdPrefix: '#',
 orderPickupLabel: '上車',
@@ -154,7 +142,6 @@ orderAccept: '接單',
 orderAcceptDisabledHint: '請先登入/選擇司機',
 orderEmpty: '目前沒有訂單',
 
-// Order status (new, i18n-based)
 orderStatus_pending: '等待派單',
 orderStatus_assigned: '已指派',
 orderStatus_accepted: '司機已接單',
@@ -246,11 +233,9 @@ orderStatus_cancelled: '已取消',
     loginFailed: 'Login failed',
     registerFailed: 'Registration failed',
 
-    // legacy keys
     auth_loginFailed: 'Incorrect password!',
     auth_registerFailed: 'This username is already taken!',
 
-    // Error mapping
     errorUsernameTaken: 'This username already exists. Please try again.',
     errorMissingFields: 'Please enter both username and password.',
     errorUserNotFound: 'Please sign up first.',
@@ -409,11 +394,9 @@ orderStatus_cancelled: 'Cancelled',
     loginFailed: '로그인 실패',
     registerFailed: '회원가입 실패',
 
-    // legacy keys
     auth_loginFailed: '비밀번호가 잘못되었습니다!',
     auth_registerFailed: '이미 사용 중인 아이디입니다!',
 
-    // errors
     errorUsernameTaken: '이미 존재하는 아이디입니다. 다시 입력해 주세요.',
     errorMissingFields: '아이디와 비밀번호를 모두 입력하세요.',
     errorUserNotFound: '먼저 회원가입해 주세요.',
@@ -576,11 +559,9 @@ orderStatus_cancelled: '취소됨',
     loginFailed: 'ログイン失敗',
     registerFailed: '登録失敗',
 
-    // legacy keys
     auth_loginFailed: 'パスワードが正しくありません！',
     auth_registerFailed: 'このアカウント名は既に使用されています！',
 
-    // errors
     errorUsernameTaken:
       'このアカウント名は既に存在します。再入力してください。',
     errorMissingFields: 'アカウントとパスワードを入力してください。',
