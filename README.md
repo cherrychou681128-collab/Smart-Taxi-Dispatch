@@ -16,7 +16,7 @@ The ultimate goal is send drivers to busy areas before passengers even request a
 Due to GitHub's strict file size limit (100MB), the complete NYC road network file and the full 311 dataset are not directly included in this repository. 
 
 To run the full simulation and model training, please follow these steps:
-1. Download the large files from this link: **[Insert Your Google Drive/Cloud Link Here]**
+1. Download the large files from this link: **[(https://drive.google.com/drive/folders/1LJQ7n9PiDCiJlUS_GWxFO8NUqzvf2j8b?usp=sharing)]**
 2. Place the network file `nyc.net.xml` into the `simulation/` directory.
 3. Place the raw dataset `nyc_311_2025_07.csv` into the `data/` directory.
 
