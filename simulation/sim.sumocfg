@@ -1,0 +1,11 @@
+<configuration>
+    <input>
+        <net-file value="grid.net.xml"/>
+        <route-files value="trips.xml"/>
+    </input>
+
+    <time>
+        <begin value="0"/>
+        <end value="30000"/>
+    </time>
+</configuration>
