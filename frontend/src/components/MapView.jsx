@@ -15,7 +15,6 @@ import { taxiIcon, passengerIcon, dropoffIcon } from '../mapIcons'
 import { t } from '../i18n'
 import { apiFetch as defaultApiFetch } from '../apiBase.js'
 
-// ====== 設定 ======
 const DEFAULT_CENTER = [40.758, -73.9855]
 const DEFAULT_ZOOM = 11
 const STEP_MS = 60
@@ -28,7 +27,6 @@ const ORDER_START_PREFIX = 'orderStart:'
 const ORDER_ROUTE_PREFIX = 'orderRoute:'
 const SUMO_TRACE_URL = import.meta.env?.VITE_SUMO_TRACE_URL || '/sumo_traces/demo.json'
 
-// ====== 物理參數（fallback physics sim 用） ======
 const CAR_ACCEL = 3.5
 const CAR_DECEL = 4.0
 const INITIAL_V = 2.0
@@ -42,7 +40,6 @@ const ACTIVE_STATUS_SET = new Set([
   'picked_up', 'in_progress', 'on_trip', 'ongoing',
 ])
 
-// ====== ✅ Playback Factor Shared Sync (driver/passenger 即時同步) ======
 const PLAYBACK_LS_KEY = 'simPlaybackFactor'
 const PLAYBACK_EVT = 'simPlaybackFactorChanged'
 
@@ -97,7 +94,6 @@ function usePlaybackFactorSync() {
   return [factor, update]
 }
 
-// ====== Utils ======
 function sameId(a, b) {
   const A = Number(a)
   const B = Number(b)
@@ -145,7 +141,6 @@ function canShowPassengerPlannedRoute(order) {
   )
 }
 
-// ====== Order Start LocalStorage ======
 function readOrderStart(orderKey) {
   try {
     if (!orderKey) return null
@@ -208,7 +203,6 @@ function writeOrderRoute(orderKey, coords) {
   } catch {}
 }
 
-// ====== Driver Click Handler ======
 function DriverClickHandler({ enabled, driverId, onLocationChange, apiFetch }) {
   useMapEvents({
     click(e) {
@@ -230,7 +224,6 @@ function DriverClickHandler({ enabled, driverId, onLocationChange, apiFetch }) {
   return null
 }
 
-// ====== Resize Fixer ======
 function MapSizeFixer({ deps = [] }) {
   const map = useMap()
   useEffect(() => {
@@ -244,7 +237,6 @@ function MapSizeFixer({ deps = [] }) {
   return null
 }
 
-// ====== Map State Persistence ======
 function mapStateKey({ mode, driverId, previewEnabled }) {
   return `mapState:${mode}:${driverId ?? 'na'}:${previewEnabled ? 'p1' : 'p0'}`
 }
@@ -307,7 +299,6 @@ function MapViewInitializer({ storageKey, streetViewMode, getInitialTarget }) {
   return null
 }
 
-// ====== OSRM ======
 async function fetchOsrmRoute(points, { signal } = {}) {
   if (!Array.isArray(points) || points.length < 2) return null
   const coordStr = points.map(p => `${p.lng},${p.lat}`).join(';')
@@ -320,7 +311,6 @@ async function fetchOsrmRoute(points, { signal } = {}) {
   return coords.map(([lng, lat]) => [lat, lng])
 }
 
-// ====== Waypoints Builder ======
 function isSameLL(a, b, eps = 1e-6) {
   if (!a || !b) return false
   return Math.abs(a.lat - b.lat) < eps && Math.abs(a.lng - b.lng) < eps
@@ -425,7 +415,6 @@ function buildPlannedWaypoints(order) {
   return waypoints
 }
 
-// ====== Simulation Logic ======
 function simKey(k) { return `sim:${k}` }
 function readSim(k) { try { return JSON.parse(localStorage.getItem(simKey(k))) } catch { return null } }
 function writeSim(k, o) { try { localStorage.setItem(simKey(k), JSON.stringify(o)) } catch {} }
@@ -466,7 +455,6 @@ function completeSim(k) {
   writeSim(k, { ...c, running: false, completed: true, startedAt: Date.now() })
 }
 
-// ====== Math & Geo Utils ======
 function toRad(d) { return (d * Math.PI) / 180 }
 function normDeg(d) { return ((d % 360) + 360) % 360 }
 function smoothLerpFactor(dtMs, tauMs) { return 1 - Math.exp(-Math.max(0, dtMs) / Math.max(1, tauMs)) }
@@ -507,7 +495,6 @@ function computeHeadingDeg(from, to) {
   return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360
 }
 
-// ====== SUMO Utils ======
 function resolveSumoVehicleId(json, order) {
   const v = json?.vehicles
   if (!v) return null
@@ -537,7 +524,6 @@ function resolveSumoVehicleId(json, order) {
     if (v[id]?.points?.length) return id
   }
 
-  // 只有 trace 裡本來就只有一台車時，才安全地直接使用
   if (ids.length === 1 && v[ids[0]]?.points?.length) {
     return ids[0]
   }
@@ -618,7 +604,6 @@ function buildSpeedProfile(points) {
   return { totalTime, totalDist, startT, distAt, speedAt, angleAt }
 }
 
-// ====== Icons ======
 function makeTaxiIcon() {
   const svg = `<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8C12 5.79086 13.7909 4 16 4H28C30.2091 4 32 5.79086 32 8V36C32 38.2091 30.2091 40 28 40H16C13.7909 40 12 38.2091 12 36V8Z" fill="black" fill-opacity="0.3" transform="translate(2, 2)"/><path d="M12 8C12 5.79086 13.7909 4 16 4H28C30.2091 4 32 5.79086 32 8V36C32 38.2091 30.2091 40 28 40H16C13.7909 40 12 38.2091 12 36V8Z" fill="#F4C430" stroke="#E6B800" stroke-width="1"/><path d="M14 10H30V16H14V10Z" fill="#333"/><path d="M14 30H30V34H14V30Z" fill="#333"/><rect x="18" y="20" width="8" height="4" rx="1" fill="#FFD700" stroke="#D4AF37" stroke-width="0.5"/><path d="M13 5H15V6H13V5Z" fill="#FFF" /><path d="M29 5H31V6H29V5Z" fill="#FFF" /><path d="M13 38H15V39H13V38Z" fill="#F00" /><path d="M29 38H31V39H29V38Z" fill="#F00" /></svg>`
   const html = `
@@ -649,7 +634,6 @@ function makeStopNumberIcon(n) {
   return L.divIcon({ className: '', html, iconSize: [28, 28], iconAnchor: [14, 14] })
 }
 
-// ====== Controls ======
 function RecenterControl({ onClick, t, lang, getTargetLatLng }) {
   const map = useMap()
   return (
@@ -1177,8 +1161,6 @@ export default function MapView({
     return currentDriverId != null && did != null && sameId(did, currentDriverId)
   }, [previewEnabled, orders, isDriverMode, currentDriverId])
 
-  // ✅ 修正：
-// 跟車不只 streetViewMode，要真正吃 followActiveCar
 const [isFollowing, setIsFollowing] = useState(true)
 
 const [tileUrl, setTileUrl] = useState('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png')
@@ -1211,16 +1193,12 @@ const runtimeOrders = useMemo(() => {
 
     const driverId = getOrderDriverId(o)
 
-    // 沒派司機的不跑 runtime car
     if (driverId == null) continue
 
-    // 只保留進行中訂單
     if (!isActiveStatus(o?.status)) continue
 
-    // 乘客端未真正派車前，不要跑 runtime 車
     if (mode === 'passenger' && !canShowPassengerRoute(o)) continue
 
-    // 司機端只顯示自己的單
     if (
       mode === 'driver' &&
       currentDriverId != null &&
@@ -1229,7 +1207,6 @@ const runtimeOrders = useMemo(() => {
       continue
     }
 
-    // 每個司機只保留當下那張進行中的單
     const key = Number(driverId)
     if (seenDriverIds.has(key)) continue
     seenDriverIds.add(key)
@@ -1361,11 +1338,6 @@ const handleRecenter = useCallback(() => {
   setIsFollowing(true)
 }, [])
 
-  // ✅ 修正：
-  // 完成訂單後：
-  // 1. driver location 寫回終點
-  // 2. 下一張訂單若使用新 orderKey，會直接吃最新 driverLoc
-  // 3. 當前這張訂單自己的 frozen start 也更新為最後位置，避免畫面回彈
   const handleLocalOrderCompleted = useCallback((oid, lastPos) => {
     const order = orders.find(o => o.id === oid)
     const drvId = getOrderDriverId(order)
