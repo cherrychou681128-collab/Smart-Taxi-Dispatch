@@ -1,13 +1,9 @@
-/* src/LandingPage.css */
-
-/* 只影響 LandingPage，不動到地圖那邊 */
 .landing-root {
   font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, system-ui,
     sans-serif;
   color: #212529;     
 }
 
-/* 首頁 hero 區塊（從你原本 <style> 搬過來） */
 .hero-section {
   background-image: url("https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1920&auto=format&fit=crop");
   background-size: cover;
@@ -29,11 +25,10 @@
 }
 
 .hero-content {
-  z-index: 2; /* 確保內容浮在遮罩上面 */
+  z-index: 2;
   width: 100%;
 }
 
-/* 仿 Uber 的叫車卡片 */
 .booking-card {
   background: white;
   padding: 30px;
@@ -41,26 +36,22 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* 司機招募區塊背景色 */
 .driver-section {
   background-color: #f8f9fa;
   padding: 80px 0;
 }
 
-/* 流程圖區塊樣式 */
 .icon-circle {
   width: 80px;
   height: 80px;
-  border-radius: 50%;       /* 變成正圓形 */
-  transition: transform 0.3s ease; /* 加入動畫效果 */
-  
-  /* 確保內容物置中 (建議補上這幾行，確保圖示在圓圈正中間) */
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 滑鼠移過去的時候，圖示會往上浮動，增加互動感 */
 .step-card:hover .icon-circle {
   transform: translateY(-10px);
 }
@@ -69,7 +60,6 @@
   letter-spacing: 2px;
 }
 
-/* 熱力圖樣式 */
 .heatmap-iframe {
   width: 100%;
   height: 600px; 
@@ -77,7 +67,6 @@
   border-radius: 8px; 
 }
 
-/* 手機版調整高度 */
 @media (max-width: 768px) {
   .heatmap-iframe {
     height: 500px;
