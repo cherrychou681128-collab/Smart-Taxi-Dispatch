@@ -1,11 +1,9 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 
-// ---- fetch polyfill (兼容 Node 16/18/20) ----
 const fetchFn =
   globalThis.fetch ||
   (async (...args) => {
@@ -17,24 +15,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.set("etag", false); // ✅ 關掉 ETag，避免 304
+app.set("etag", false);
 
-// ✅ CORS（維持你原本：開放；若之後要鎖 domain 再改）
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
-// ✅ API 全部不快取（雙保險）
 app.use("/api", (req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();
 });
 
-/* =========================================================
-   ✅ JSON 持久化 Store（修正：重啟不再需要重註冊）
-   - 預設寫在 ./data/store.json
-   - Render：磁碟不是永久的（會重置），但至少本機開發/一般部署會解決
-     如果你要 Render 永久保存，必須改用 DB（Postgres/Redis）
-   ========================================================= */
 const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
   : path.join(__dirname, "data");
@@ -71,7 +61,6 @@ function safeWriteJson(file, obj) {
   }
 }
 
-// ===== 小型「資料庫」：使用者 / 司機 / 訂單 =====
 let users = [];
 let nextUserId = 1;
 
@@ -81,7 +70,6 @@ let nextDriverId = 1;
 let orders = [];
 let nextOrderId = 1;
 
-// ✅ load store at startup
 function loadStore() {
   const init = {
     users: [],
@@ -101,7 +89,6 @@ function loadStore() {
   nextDriverId = Number(meta.nextDriverId) || 1;
   nextOrderId = Number(meta.nextOrderId) || 1;
 
-  // ✅ 保底：避免 meta 壞掉導致 id 重複
   const maxUserId = users.reduce((m, u) => Math.max(m, Number(u?.id) || 0), 0);
   const maxDriverId = drivers.reduce((m, d) => Math.max(m, Number(d?.id) || 0), 0);
   const maxOrderId = orders.reduce((m, o) => Math.max(m, Number(o?.id) || 0), 0);
@@ -125,10 +112,8 @@ function saveStore() {
   });
 }
 
-// ✅ 啟動載入
 loadStore();
 
-/* ========================================================= */
 
 const FALLBACK_GEOCODE_PLACES = [
   { label: "Times Square, Manhattan, New York, NY, USA", lat: 40.758, lng: -73.9855 },
@@ -158,7 +143,6 @@ function getAnyDriverId(o) {
   return o?.driverId ?? o?.assignedDriverId ?? o?.driver_id ?? null;
 }
 
-/* ===================== SUMO vehicle binding ===================== */
 function findSumoTraceFile() {
   const candidates = [
     path.join(__dirname, "public", "sumo_traces", "demo.json"),
@@ -197,7 +181,6 @@ function loadSumoVehicleIdsOnce() {
 function pickFreeSumoVehicleId() {
   if (!SUMO_VEHICLE_IDS.length) return null;
 
-  // 盡量避免「尚未 completed 的訂單」共用同一台 SUMO 車
   const used = new Set(
     orders
       .filter((o) => normStatus(o?.status) !== "completed")
@@ -227,9 +210,7 @@ function ensureOrderHasSumoVehicle(order) {
 }
 
 loadSumoVehicleIdsOnce();
-/* =============================================================== */
 
-// =================== Auth API：註冊 / 登入 ===================
 app.post("/api/register", (req, res) => {
   const { username, password, role, carType } = req.body;
   if (!username || !password || !role) {
@@ -259,7 +240,7 @@ app.post("/api/register", (req, res) => {
   };
 
   users.push(user);
-  saveStore(); // ✅ 持久化
+  saveStore();
 
   const { password: _, ...safeUser } = user;
   return res.json(safeUser);
@@ -293,7 +274,6 @@ app.post("/api/login", (req, res) => {
   return res.json(safeUser);
 });
 
-// =================== Geocode API ===================
 function fallbackGeocode(query) {
   const q = String(query || "").trim().toLowerCase();
   if (!q) return [];
@@ -363,10 +343,8 @@ app.get("/api/geocode", async (req, res) => {
   }
 });
 
-// =================== Hotspots proxy API ===================
 const HOTSPOT_API_BASE = String(process.env.HOTSPOT_API_BASE || "").replace(/\/+$/, "");
 
-// ✅ 避免 n 太大把 upstream 打爆（不改功能：只是上限防呆）
 function clampInt(v, { min = 1, max = 200, fallback = 25 } = {}) {
   const n = Number(v);
   if (!Number.isFinite(n)) return fallback;
@@ -413,7 +391,6 @@ app.get("/api/hotspots", async (req, res) => {
 
     const data = await r.json().catch(() => null);
 
-    // ✅ 統一回傳格式：前端只要讀 data.rows
     if (Array.isArray(data)) return res.json({ rows: data });
     if (data && typeof data === "object") {
       if (Array.isArray(data.rows)) return res.json(data);
@@ -432,15 +409,10 @@ app.get("/api/hotspots", async (req, res) => {
   }
 });
 
-// =================== Driver API ===================
-
-// 取得司機列表（前端每 3 秒會打）
 app.get("/api/drivers", (req, res) => {
   res.json(drivers);
 });
 
-// 司機登入/建立自己的車（前端 login 後會打 /api/driver-login）
-// ✅ 每次登入都清空 lat/lng（你要的行為）
 app.post("/api/driver-login", (req, res) => {
   const { name, carType } = req.body || {};
   if (!name) return res.status(400).json({ errorCode: "MISSING_FIELDS", error: "name is required" });
@@ -468,11 +440,10 @@ app.post("/api/driver-login", (req, res) => {
     driver.updatedAt = new Date().toISOString();
   }
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(driver);
 });
 
-// 司機更新定位
 app.patch("/api/drivers/:id/location", (req, res) => {
   const id = Number(req.params.id);
   const driver = drivers.find((d) => d.id === id);
@@ -487,11 +458,10 @@ app.patch("/api/drivers/:id/location", (req, res) => {
   if (typeof req.body?.status === "string") driver.status = req.body.status.trim();
   driver.updatedAt = new Date().toISOString();
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(driver);
 });
 
-// （可選）方便測試：重置司機定位
 app.post("/api/drivers/:id/reset-location", (req, res) => {
   const id = Number(req.params.id);
   const driver = drivers.find((d) => d.id === id);
@@ -502,11 +472,10 @@ app.post("/api/drivers/:id/reset-location", (req, res) => {
   driver.status = "idle";
   driver.updatedAt = new Date().toISOString();
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(driver);
 });
 
-// =================== 訂單 API ===================
 app.post("/api/orders", (req, res) => {
   const {
     pickup,
@@ -583,7 +552,7 @@ app.post("/api/orders", (req, res) => {
   };
 
   orders.push(order);
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(order);
 });
 
@@ -635,7 +604,7 @@ app.post("/api/orders/:id/assign", (req, res) => {
   const r = assignOrderAtomic({ order, driver, driverNameOverride: driverName });
   if (!r.ok) return res.status(r.code).json({ errorCode: "ASSIGN_FAILED", error: r.message });
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(r.order);
 });
 
@@ -652,7 +621,7 @@ app.post("/api/orders/:id/accept", (req, res) => {
   const r = assignOrderAtomic({ order, driver, driverNameOverride: driverName });
   if (!r.ok) return res.status(r.code).json({ errorCode: "ACCEPT_FAILED", error: r.message });
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(r.order);
 });
 
@@ -683,7 +652,7 @@ app.patch("/api/orders/:id/status", (req, res) => {
     }
   }
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(order);
 });
 
@@ -706,11 +675,10 @@ app.post("/api/orders/:id/complete", (req, res) => {
     }
   }
 
-  saveStore(); // ✅ 持久化
+  saveStore();
   return res.json(order);
 });
 
-// =================== Production：前端靜態檔案（dist 存在才掛） ===================
 const distPath = path.join(__dirname, "dist");
 const publicPath = path.join(__dirname, "public");
 
