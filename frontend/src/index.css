@@ -1,0 +1,566 @@
+/* ===== 全域基礎樣式 ===== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans TC',
+    'Segoe UI', sans-serif;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+/* ===== App 外框 ===== */
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #020617;
+}
+
+/* ===== 上方深色列（模式切換 / 語言）===== */
+
+.app-header {
+  height: 72px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #020617;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+}
+
+.app-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.app-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #020617;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  padding: 2px;
+}
+
+.mode-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.mode-btn.active {
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+}
+
+.lang-select {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.lang-label {
+  color: #9ca3af;
+}
+
+.lang-select select {
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #e5e7eb;
+  padding: 4px 10px;
+}
+
+/* ===== 共用按鈕 / 欄位 ===== */
+
+.ghost-btn {
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: transparent;
+  color: #e5e7eb;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.primary-btn {
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 700;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  border-radius: 999px;
+  border: none;
+  background: #0ea5e9;
+  color: #0b1120;
+  font-weight: 600;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.text-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #e5e7eb;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+.text-input::placeholder {
+  color: #6b7280;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+/* ===== 訂單列表共用 ===== */
+
+.orders-block {
+  margin-top: 20px;
+}
+
+.orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.orders-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.orders-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-item {
+  border-radius: 16px;
+  background: #020617;
+  border: 1px solid rgba(31, 41, 55, 0.9);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-title {
+  font-size: 0.9rem;
+}
+
+.order-status {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.empty-text {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.error-box {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  background: rgba(153, 27, 27, 0.9);
+  border: 1px solid rgba(248, 113, 113, 0.8);
+  color: #fee2e2;
+}
+
+/* 顯示目前司機/乘客的小框 */
+
+.current-driver-box {
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  padding: 8px 12px;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+/* ===== 主內容（地圖 + 側邊卡片）===== */
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+}
+
+/* 地圖鋪滿，側邊卡片浮在上面（桌機 / 寬螢幕） */
+.map-section {
+  position: relative;
+  height: calc(100vh - 72px);
+  background: #020617;
+}
+
+.map-wrapper {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+
+/* Leaflet 地圖一定要有高寬 */
+.map-wrapper .leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* 右側 / 底部 浮動面板 */
+.side-panel {
+  position: absolute;
+  z-index: 2000; /* ⭐ 確保在地圖上層 */
+  top: 16px;
+  right: 24px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: calc(100% - 32px);
+
+  background: rgba(15, 23, 42, 0.94);
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+
+  padding: 24px 24px 20px;
+  overflow-y: auto;
+}
+
+/* 捲軸美化（側邊卡片） */
+.side-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.side-panel::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.6);
+  border-radius: 999px;
+}
+.side-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Leaflet emoji icon 微調 */
+
+.taxi-icon,
+.passenger-icon,
+.dest-icon {
+  font-size: 24px;
+  text-align: center;
+  line-height: 24px;
+}
+
+/* ===== 登入 / 註冊頁 ===== */
+
+.auth-main {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 16px;
+  background: radial-gradient(circle at top, #111827 0, #020617 55%, #020617 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #020617;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
+  padding: 20px 20px 24px;
+}
+
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.auth-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.auth-tabs {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #020617;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  padding: 2px;
+  margin-bottom: 14px;
+}
+
+.auth-tab {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.auth-tab.active {
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.auth-message {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  background: rgba(8, 47, 73, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.8);
+  color: #e0f2fe;
+}
+
+.auth-hint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.link-btn {
+  border: none;
+  background: transparent;
+  color: #38bdf8;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+/* ===== LandingPage 用的樣式（首頁 Hero + 司機招募）===== */
+
+.hero-section {
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1920&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.booking-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.driver-section {
+  background-color: #f8f9fa;
+  padding: 80px 0;
+}
+
+/* ===== RWD：螢幕變窄時，黑框改放在下方 ===== */
+
+@media (max-width: 900px) {
+  .app-header {
+    padding: 0 12px;
+  }
+
+  .map-section {
+    height: calc(100vh - 72px);
+  }
+
+  .side-panel {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
+    max-height: 55%;
+    padding: 16px 16px 14px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    height: 64px;
+  }
+
+  .map-section {
+    height: calc(100vh - 64px);
+  }
+
+  .app-header-controls {
+    gap: 6px;
+  }
+
+  /* 如果寬度很窄，可以選擇把上面那個 mode-toggle 收起來
+     如果你想一直顯示，就把這一段刪掉 */
+  .mode-toggle {
+    display: none;
+  }
+
+  .side-panel {
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    max-height: 60%;
+  }
+}
+/* 頂部列 */
+.top-bar {
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #050816; /* 原本深藍底 */
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  z-index: 20;
+  position: relative;
+}
+
+.top-bar-left .app-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.top-bar-center {
+  flex: 1;
+}
+
+/* 右邊區塊：使用者資訊 + 回首頁 + 語言 + 模擬 */
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-user-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 回首頁按鈕 */
+.header-back-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+/* 語言選單 */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.lang-switch select {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  color: #000;
+  font-size: 13px;
+}
+
+/* 模擬按鈕 */
+.sim-toggle-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #ffb020;
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.sim-toggle-btn:hover {
+  background: #ffcf4d;
+  transform: translateY(-1px);
+}
+
+/* 如果你原本還有 role-switch 這種 class，直接隱藏掉 */
+.role-switch,
+.role-toggle,
+.role-tabs {
+  display: none !important;
+}
