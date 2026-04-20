@@ -2,22 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 
-# =========================
-# 路徑設定
-# =========================x
 NPZ_PATH = r"plot_data_hybrid_8x8.npz"
 CSV_PATH = r"demand_8x8.csv"
 
-# =========================
-# 檢查檔案
-# =========================
 if not os.path.exists(NPZ_PATH):
     print(f"錯誤：找不到檔案 {NPZ_PATH}")
     exit()
 
-# =========================
-# 載入 npz
-# =========================
 data = np.load(NPZ_PATH)
 
 print("[INFO] npz keys:", data.files)
@@ -32,10 +23,6 @@ y_pred = data["y_pred"]
 print("[INFO] y_true shape:", y_true.shape)
 print("[INFO] y_pred shape:", y_pred.shape)
 
-# =========================
-# shape 檢查
-# 預期: (N, 1, 8, 8)
-# =========================
 if y_true.ndim != 4 or y_pred.ndim != 4:
     print("錯誤：y_true / y_pred 維度不對，預期為 4 維 (N,1,8,8)")
     exit()
@@ -51,9 +38,6 @@ if (N, C, H, W) != (N2, C2, H2, W2):
     print("錯誤：y_true 與 y_pred shape 不一致")
     exit()
 
-# =========================
-# 攤平成表格
-# =========================
 rows = []
 
 for t in range(N):
@@ -69,9 +53,6 @@ for t in range(N):
 
 df = pd.DataFrame(rows)
 
-# =========================
-# 存成 csv
-# =========================
 df.to_csv(CSV_PATH, index=False, encoding="utf-8-sig")
 
 print(f"[SUCCESS] 已輸出 CSV：{CSV_PATH}")
