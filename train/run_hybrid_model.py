@@ -5,9 +5,6 @@ import xgboost as xgb
 import torch.nn as nn
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-# =============================
-# 1. ConvLSTM 模型架構
-# =============================
 class ConvLSTMCell(nn.Module):
     def __init__(self, in_ch, hid_ch, k=3):
         super().__init__()
@@ -43,9 +40,6 @@ class ConvLSTM(nn.Module):
                 inp = h[i]
         return self.head(h[-1])
 
-# =============================
-# 2. 核心功能函式
-# =============================
 def create_xgb_data(X_grid, y_grid, coords):
     N, T, C, H, W = X_grid.shape
     feats, targets = [], []
@@ -62,15 +56,12 @@ def create_xgb_data(X_grid, y_grid, coords):
             targets.append(y_grid[n, 0, y, x])
     return np.array(feats), np.array(targets)
 
-# =============================
-# 3. 主程式
-# =============================
 if __name__ == "__main__":
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
     MODEL_PATH = "best_t24convlstm/best.pt" 
     TRAIN_NPZ = "train_t24.npz"
     TEST_NPZ = "test_t24.npz"
-    SAVE_RESULT_PATH = "plot_data.npz" # 關鍵：產出繪圖用檔案
+    SAVE_RESULT_PATH = "plot_data.npz"
 
     coords = [(y, x) for y in range(32) for x in range(32)] 
 
@@ -79,7 +70,6 @@ if __name__ == "__main__":
     test_data = np.load(TEST_NPZ)
     X_test_np, y_test_np = test_data["X"], test_data["y"]
 
-    # --- B. ConvLSTM 預測 ---
     print("[2/5] ConvLSTM Predicting...")
     model = ConvLSTM().to(DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
@@ -88,9 +78,7 @@ if __name__ == "__main__":
         X_test_torch = torch.from_numpy(X_test_np).float().to(DEVICE)
         pred_conv = model(X_test_torch).cpu().numpy()
 
-    # --- C. XGBoost 訓練 ---
     print("[3/5] Preparing XGBoost Features...")
-    # 限制訓練樣本數以節省記憶體，如需完整訓練可移除 [:500]
     X_xgb_train, y_xgb_train = create_xgb_data(train_data["X"][:500], train_data["y"][:500], coords)
     X_xgb_test, y_xgb_test = create_xgb_data(X_test_np, y_test_np, coords)
 
@@ -100,19 +88,14 @@ if __name__ == "__main__":
     pred_xgb_flat = xgb_reg.predict(X_xgb_test)
     pred_xgb_grid = pred_xgb_flat.reshape(len(X_test_np), 1, 32, 32)
 
-    # --- D. 權重融合與評估 ---
     print("[5/5] Fusing & Saving Results...")
     ALPHA_WEIGHT = 0.7
     final_pred = (ALPHA_WEIGHT * pred_conv) + ((1 - ALPHA_WEIGHT) * pred_xgb_grid)
     
-    # 確保不會有負值 (XGBoost 可能會預測出負數)
     final_pred = np.maximum(final_pred, 0)
-
-    # 儲存結果供繪圖使用 (y_pred 使用融合後的結果)
     np.savez(SAVE_RESULT_PATH, y_true=y_test_np, y_pred=final_pred)
     print(f"[DONE] 融合結果已儲存至 {SAVE_RESULT_PATH}")
 
-    # 數據指標計算
     rmse_conv = np.sqrt(mean_squared_error(y_test_np.flatten(), pred_conv.flatten()))
     rmse_hybrid = np.sqrt(mean_squared_error(y_test_np.flatten(), final_pred.flatten()))
 
