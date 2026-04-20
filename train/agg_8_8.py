@@ -5,9 +5,6 @@ import xgboost as xgb
 import torch.nn as nn
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-# =============================
-# 1. ConvLSTM 模型架構
-# =============================
 class ConvLSTMCell(nn.Module):
     def __init__(self, in_ch, hid_ch, k=3):
         super().__init__()
@@ -49,10 +46,7 @@ class ConvLSTM(nn.Module):
                 inp = h[i]
 
         return self.head(h[-1])
-
-# =============================
-# 2. 核心功能函式
-# =============================
+        
 def create_xgb_data(X_grid, y_grid, coords):
     N, T, C, H, W = X_grid.shape
     feats, targets = [], []
@@ -81,21 +75,17 @@ def aggregate_32_to_8_batch(arr):
     if C != 1 or H != 32 or W != 32:
         raise ValueError(f"輸入 shape 錯誤: {arr.shape}，預期是 (N,1,32,32)")
 
-    # 每個 4x4 block 做加總
     out = arr.reshape(N, C, 8, 4, 8, 4).sum(axis=(3, 5))
     return out
 
-# =============================
-# 3. 主程式
-# =============================
 if __name__ == "__main__":
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
     MODEL_PATH = "best_t24convlstm/best.pt"
     TRAIN_NPZ = "train_t24.npz"
     TEST_NPZ = "test_t24.npz"
 
-    SAVE_RESULT_PATH = "plot_data_hybrid_32x32.npz"   # 原始融合結果
-    SAVE_AGG_PATH    = "plot_data_hybrid_8x8.npz"     # 聚合後結果
+    SAVE_RESULT_PATH = "plot_data_hybrid_32x32.npz"
+    SAVE_AGG_PATH    = "plot_data_hybrid_8x8.npz"
 
     coords = [(y, x) for y in range(32) for x in range(32)]
 
@@ -107,7 +97,6 @@ if __name__ == "__main__":
     print(f"[INFO] X_test shape: {X_test_np.shape}")
     print(f"[INFO] y_test shape: {y_test_np.shape}")
 
-    # --- B. ConvLSTM 預測 ---
     print("[2/5] ConvLSTM Predicting...")
     model = ConvLSTM().to(DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
@@ -118,10 +107,8 @@ if __name__ == "__main__":
         pred_conv = model(X_test_torch).cpu().numpy()
 
     print(f"[INFO] pred_conv shape: {pred_conv.shape}")
-
-    # --- C. XGBoost 訓練 ---
     print("[3/5] Preparing XGBoost Features...")
-    # 若記憶體夠，可把 [:500] 拿掉
+
     X_xgb_train, y_xgb_train = create_xgb_data(train_data["X"][:500], train_data["y"][:500], coords)
     X_xgb_test, y_xgb_test = create_xgb_data(X_test_np, y_test_np, coords)
 
@@ -139,37 +126,30 @@ if __name__ == "__main__":
 
     print(f"[INFO] pred_xgb_grid shape: {pred_xgb_grid.shape}")
 
-    # --- D. 權重融合 ---
     print("[5/5] Fusing, Aggregating & Saving Results...")
     ALPHA_WEIGHT = 0.7
     final_pred = (ALPHA_WEIGHT * pred_conv) + ((1 - ALPHA_WEIGHT) * pred_xgb_grid)
 
-    # 避免負值
     final_pred = np.maximum(final_pred, 0)
 
-    # ===== 先存原始 32x32 融合結果 =====
     np.savez(SAVE_RESULT_PATH, y_true=y_test_np, y_pred=final_pred)
     print(f"[DONE] 原始 32x32 融合結果已儲存至 {SAVE_RESULT_PATH}")
 
-    # ===== 聚合成 8x8 =====
     y_true_agg = aggregate_32_to_8_batch(y_test_np)
     y_pred_agg = aggregate_32_to_8_batch(final_pred)
 
     print(f"[INFO] y_true_agg shape: {y_true_agg.shape}")
     print(f"[INFO] y_pred_agg shape: {y_pred_agg.shape}")
 
-    # ===== 存聚合後結果 =====
     np.savez(SAVE_AGG_PATH, y_true=y_true_agg, y_pred=y_pred_agg)
     print(f"[DONE] 聚合後 8x8 結果已儲存至 {SAVE_AGG_PATH}")
 
-    # ===== 數據指標計算：32x32 =====
     rmse_conv = np.sqrt(mean_squared_error(y_test_np.flatten(), pred_conv.flatten()))
     mae_conv = mean_absolute_error(y_test_np.flatten(), pred_conv.flatten())
 
     rmse_hybrid = np.sqrt(mean_squared_error(y_test_np.flatten(), final_pred.flatten()))
     mae_hybrid = mean_absolute_error(y_test_np.flatten(), final_pred.flatten())
 
-    # ===== 數據指標計算：8x8 聚合後 =====
     rmse_hybrid_agg = np.sqrt(mean_squared_error(y_true_agg.flatten(), y_pred_agg.flatten()))
     mae_hybrid_agg = mean_absolute_error(y_true_agg.flatten(), y_pred_agg.flatten())
 
