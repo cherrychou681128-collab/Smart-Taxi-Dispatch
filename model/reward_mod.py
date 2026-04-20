@@ -4,10 +4,6 @@ import json
 import time
 from typing import Dict, Any
 
-
-# =========================
-# Reward MOD (State + Events)
-# =========================
 DEFAULT_STATE = {
     "driver_points": 0.0,
     "bias": 0.0,
@@ -34,10 +30,7 @@ def points_to_bias(points: float) -> float:
 
 
 def update_state_from_events(state: Dict[str, Any], events_path: Path) -> Dict[str, Any]:
-    """
-    reward_events.jsonl 每行一筆：
-    {"ts":..., "chosen": {...}, "best": {...}}
-    """
+
     if not events_path.exists():
         state["bias"] = points_to_bias(float(state.get("driver_points", 0.0)))
         return state
@@ -61,7 +54,6 @@ def update_state_from_events(state: Dict[str, Any], events_path: Path) -> Dict[s
         chosen_score = float(chosen.get("score", 0.0))
         best_score = float(best.get("score", chosen_score))
 
-        # ====== 獎懲規則 ======
         r_demand = pred * 8.0
         p_distance = -dist * 1.2
         p_low_demand = -3.0 if pred < 0.2 else 0.0
@@ -79,9 +71,7 @@ def update_state_from_events(state: Dict[str, Any], events_path: Path) -> Dict[s
 
 
 def get_bias(outputs_dir: Path, enable: bool = True) -> float:
-    """
-    給主程式呼叫：回傳目前 bias
-    """
+
     if not enable:
         return 0.0
     state_path = outputs_dir / "reward_state.json"
@@ -94,11 +84,7 @@ def get_bias(outputs_dir: Path, enable: bool = True) -> float:
 
 
 def apply_bias_to_score(base_score: float, pred: float, dist_km: float, bias: float) -> float:
-    """
-    給主程式呼叫：把 bias 影響到綜合分數
-    你可以把這裡視為「MOD 的核心」：主程式只要把 pred/dist/base_score 丟進來就好
-    """
-    # 範例：bias 提高時更偏好高需求、較不在意距離
+
     wDemand = 1.0 + 0.25 * bias
     wDist = 0.6 - 0.10 * bias
     return base_score + pred * wDemand - dist_km * wDist
