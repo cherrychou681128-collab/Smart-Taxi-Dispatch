@@ -4,11 +4,10 @@ from collections import defaultdict
 import sumolib
 
 def fcd_to_demo_json(net_xml, fcd_xml, out_json, max_vehicles=80, max_points_per_vehicle=2500):
-    # 讀路網，用來把 x,y 轉 lon,lat
     net = sumolib.net.readNet(net_xml)
 
     vehicles = defaultdict(list)
-    seen_order = []  # preserve first-seen order to cap max_vehicles
+    seen_order = []
 
     ctx = ET.iterparse(fcd_xml, events=("start", "end"))
     _, root = next(ctx)
@@ -25,7 +24,6 @@ def fcd_to_demo_json(net_xml, fcd_xml, out_json, max_vehicles=80, max_points_per
                 elem.clear()
                 continue
 
-            # 限制車輛數，避免 JSON 爆掉
             if vid not in vehicles:
                 if len(seen_order) >= max_vehicles:
                     elem.clear()
@@ -34,8 +32,8 @@ def fcd_to_demo_json(net_xml, fcd_xml, out_json, max_vehicles=80, max_points_per
 
             x = elem.attrib.get("x")
             y = elem.attrib.get("y")
-            speed = elem.attrib.get("speed")  # m/s
-            angle = elem.attrib.get("angle")  # deg
+            speed = elem.attrib.get("speed")
+            angle = elem.attrib.get("angle")
 
             if x is None or y is None:
                 elem.clear()
@@ -54,7 +52,6 @@ def fcd_to_demo_json(net_xml, fcd_xml, out_json, max_vehicles=80, max_points_per
 
             vehicles[vid].append(p)
 
-            # 限制點數
             if max_points_per_vehicle and len(vehicles[vid]) > max_points_per_vehicle:
                 vehicles[vid] = vehicles[vid][-max_points_per_vehicle:]
 
@@ -68,14 +65,14 @@ def fcd_to_demo_json(net_xml, fcd_xml, out_json, max_vehicles=80, max_points_per
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
 
-    print(f"✅ wrote {out_json}  vehicles={len(seen_order)}")
+    print(f"wrote {out_json}  vehicles={len(seen_order)}")
 
 if __name__ == "__main__":
-    # 例：python tools/fcd_to_demo_json.py
+
     fcd_to_demo_json(
         net_xml="sumo/nyc.net.xml",
         fcd_xml="sumo/fcd.xml",
-        out_json="src/public/sumo_traces/demo.json",  # 你可改成你的路徑
+        out_json="src/public/sumo_traces/demo.json",
         max_vehicles=80,
         max_points_per_vehicle=2500,
     )
