@@ -18,11 +18,9 @@ def main():
     if not cent_path.exists():
         raise FileNotFoundError(cent_path)
 
-    # 讀資料
-    df_pred = pd.read_csv(pred_path)  # 需要：PULocationID, pred_rides
-    df_cent = pd.read_csv(cent_path)  # 需要：LocationID, lon, lat, Borough, Zone
+    df_pred = pd.read_csv(pred_path)
+    df_cent = pd.read_csv(cent_path)
 
-    # 座標 2263 → 4326
     transformer = Transformer.from_crs("EPSG:2263", "EPSG:4326", always_xy=True)
     lon_wgs, lat_wgs = transformer.transform(df_cent["lon"].values,
                                              df_cent["lat"].values)
@@ -133,23 +131,19 @@ def main():
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// ===== Python 帶進來的資料 =====
 var zones = __ZONES_JSON__;
 
-// ===== 地圖初始化 =====
 var map = L.map('map').setView([__CENTER_LAT__, __CENTER_LON__], 11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom:19
 }).addTo(map);
 
-// ===== 車子 icon =====
 var carIcon = L.icon({
   iconUrl: '../taxi.jpg',
   iconSize: [42,42],
   iconAnchor: [21,21]
 });
 
-// ===== 畫需求氣泡 =====
 zones.forEach(function(z){
   var color =
     z.pred_rides > 0.8 ? '#ff0000' :
@@ -168,7 +162,6 @@ zones.forEach(function(z){
   ).addTo(map);
 });
 
-// ===== 直線距離（公里） =====
 function haversine(lat1, lon1, lat2, lon2){
   var R = 6371;
   var dLat = (lat2-lat1)*Math.PI/180;
@@ -180,19 +173,16 @@ function haversine(lat1, lon1, lat2, lon2){
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// ===== 預估車資（簡化版） =====
 function estimateFare(dist_km){
   var base = 2.5;
   var perKm = 1.5;
   return base + perKm * Math.max(1, dist_km);
 }
 
-// ===== 綜合分數：需求 + 車資 - 距離 =====
 function calcScore(pred, dist_km, fare){
   return pred * 1.0 + fare * 0.3 - dist_km * 0.5;
 }
 
-// ===== OSRM 路線 =====
 async function getRoute(fromLat, fromLon, toLat, toLon){
   var url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=full&geometries=geojson`;
   try {
@@ -211,7 +201,6 @@ async function getRoute(fromLat, fromLon, toLat, toLon){
   }
 }
 
-// ===== 小車動畫 =====
 var carMarker = null;
 var carTimer = null;
 
@@ -240,11 +229,8 @@ function playCar(route){
     carMarker.setLatLng(route.coords[i]);
   }, 80);
 }
-
-// 存目前路線的 polyline
 var routeLayers = [];
 
-// ===== 點地圖：計算推薦 Top3 =====
 map.on('click', async function(e){
   var lat = e.latlng.lat;
   var lon = e.latlng.lng;
@@ -252,11 +238,9 @@ map.on('click', async function(e){
   document.getElementById("driver-pos").innerHTML =
     "司機位置：<br>lat=" + lat.toFixed(5) + "<br>lon=" + lon.toFixed(5);
 
-  // 清掉舊路線
   routeLayers.forEach(function(l){ map.removeLayer(l); });
   routeLayers = [];
 
-  // 先用直線距離粗排
   var initial = zones.map(function(z){
     var d = haversine(lat, lon, z.lat_wgs, z.lon_wgs);
     var f = estimateFare(d);
@@ -267,7 +251,6 @@ map.on('click', async function(e){
     };
   }).sort(function(a,b){ return b.approxScore - a.approxScore; }).slice(0,3);
 
-  // 取得路線並重新計分
   var top3 = [];
   for (let item of initial){
     var z = item.info;
@@ -288,7 +271,6 @@ map.on('click', async function(e){
 
   top3.sort(function(a,b){ return b.score - a.score; });
 
-  // 畫三條路線
   var colors = ["blue","green","purple"];
   top3.forEach(function(t, idx){
     var poly = L.polyline(t.coords, {
@@ -299,7 +281,6 @@ map.on('click', async function(e){
     routeLayers.push(poly);
   });
 
-  // 更新右邊卡片
   var rankDiv = document.getElementById("rank");
   rankDiv.innerHTML = "";
 
