@@ -20,9 +20,7 @@ def check_data_leakage(train_path, test_path):
     print(f"訓練集形狀: X={X_train.shape}, y={y_train.shape}")
     print(f"測試集形狀: X={X_test.shape}, y={y_test.shape}")
 
-    print("\n===== 2. 時間洩漏檢查 (Look-ahead Bias) =====")
-    # 檢查 X 的最後一個時間步是否與 y 相同
-    # 假設 X 形狀為 (N, T, C, H, W)
+    print("\n===== 2.時間洩漏檢查 =====")
     last_timestep_X = X_train[0, -1, 0] 
     target_y = y_train[0, 0]
     
@@ -33,10 +31,8 @@ def check_data_leakage(train_path, test_path):
         print(" 通過：輸入特徵與預測目標無直接重疊。")
 
     print("\n===== 3. 訓練/測試集交叉污染檢查 =====")
-    # 檢查測試集的第一筆資料是否出現在訓練集中
-    # 這能防止資料切分時發生隨機洗牌（Shuffle）導致的時間軸錯亂
     found_overlap = False
-    for i in range(min(100, len(train_data['X']))): # 抽樣檢查
+    for i in range(min(100, len(train_data['X']))):
         if np.array_equal(test_data['X'][0], train_data['X'][i]):
             found_overlap = True
             break
@@ -48,7 +44,6 @@ def check_data_leakage(train_path, test_path):
 
 def check_feature_importance(xgb_model, feature_names=None):
     print("\n===== 4. XGBoost 特徵貢獻度分析 =====")
-    # 如果某個特徵權重異常高（例如 0.99），通常代表該特徵有洩漏疑慮
     importance = xgb_model.get_fscore()
     importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
     
@@ -56,7 +51,6 @@ def check_feature_importance(xgb_model, feature_names=None):
     for feat, score in importance[:5]:
         print(f"特徵 {feat}: 貢獻度 {score}")
     
-    # 繪圖
     plt.figure(figsize=(10, 6))
     xgb.plot_importance(xgb_model, max_num_features=10)
     plt.title("XGBoost Feature Importance")
@@ -70,10 +64,9 @@ def check_prediction_distribution(y_true, y_pred):
     print(f"真實值區間: [{y_true_flat.min():.2f}, {y_true_flat.max():.2f}]")
     print(f"預測值區間: [{y_pred_all.min():.2f}, {y_pred_all.max():.2f}]")
     
-    if y_pred_all.min() < -1: # 容許微小的浮點數誤差
+    if y_pred_all.min() < -1:
         print(" 警告：預測值出現負數，這在需求預測中不符合物理邏輯。")
     
-    # 繪製殘差分佈
     plt.figure(figsize=(8, 5))
     sns.histplot(y_pred_all - y_true_flat, kde=True, bins=50)
     plt.axvline(0, color='red', linestyle='--')
@@ -81,15 +74,8 @@ def check_prediction_distribution(y_true, y_pred):
     plt.xlabel("Error")
     plt.show()
 
-# --- 執行檢查 ---
 if __name__ == "__main__":
-    # 請根據你的實際檔案路徑修改
     TRAIN_PATH = "train_t24.npz"
     TEST_PATH = "test_t24.npz"
     
     check_data_leakage(TRAIN_PATH, TEST_PATH)
-    
-    # 如果你已經有跑完的結果，可以傳入進行分佈檢查：
-    # check_prediction_distribution(y_test_np, final_pred)
-    # 如果有訓練好的 xgb_model：
-    # check_feature_importance(xgb_reg)
