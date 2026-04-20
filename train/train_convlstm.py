@@ -4,9 +4,6 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
-# =============================
-# 訓練參數
-# =============================
 DS_PATH = "train_t24.npz"
 VAL_PATH = "valid_t24.npz"
 CKPT_DIR = "best_t24convlstm"
@@ -16,20 +13,16 @@ EPOCHS = 100
 LR = 1e-3
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# ===== Peak / Balance 參數 =====
 PEAK_Q = 0.90
-ALPHA = 10.0   # 權重係數
-P_POWER = 1.2  # 穩定性冪次
+ALPHA = 10.0
+P_POWER = 1.2
 EPS = 1e-6
 
-BETA  = 0.6    # Loss 平衡
-GAMMA = 0.5    # Score 平衡 (MAE 與 RMSE 的權重分配)
+BETA  = 0.6
+GAMMA = 0.5
 
 os.makedirs(CKPT_DIR, exist_ok=True)
 
-# =============================
-# Dataset
-# =============================
 class NpzGridDataset(Dataset):
     def __init__(self, npz_path):
         if not os.path.exists(npz_path):
@@ -44,9 +37,6 @@ class NpzGridDataset(Dataset):
     def __getitem__(self, idx):
         return torch.from_numpy(self.X[idx]), torch.from_numpy(self.y[idx])
 
-# =============================
-# ConvLSTM Model
-# =============================
 class ConvLSTMCell(nn.Module):
     def __init__(self, in_ch, hid_ch, k=3):
         super().__init__()
@@ -87,9 +77,6 @@ class ConvLSTM(nn.Module):
                 inp = h[i]
         return self.head(h[-1])
 
-# =============================
-# Loss & 多元指標評估 (含 RMSE)
-# =============================
 def compute_thr(npz_path, q):
     y = np.load(npz_path)["y"].reshape(-1)
     nz = y[y > 0]
@@ -117,12 +104,9 @@ def eval_metrics(model, loader, thr):
     preds = torch.cat(all_preds)
     ys = torch.cat(all_ys)
 
-    # --- 計算多種指標 ---
-    # 1. 全域指標
     mae_all = torch.abs(preds - ys).mean().item()
     rmse_all = torch.sqrt(((preds - ys) ** 2).mean()).item()
 
-    # 2. Peak 區域指標 (真實值 >= 門檻)
     mask = ys >= thr
     if mask.any():
         mae_peak = torch.abs(preds[mask] - ys[mask]).mean().item()
@@ -132,9 +116,6 @@ def eval_metrics(model, loader, thr):
 
     return mae_all, rmse_all, mae_peak, rmse_peak
 
-# =============================
-# Main
-# =============================
 def main():
     train_ld = DataLoader(NpzGridDataset(DS_PATH), BATCH, shuffle=True)
     valid_ld = DataLoader(NpzGridDataset(VAL_PATH), BATCH, shuffle=False)
@@ -163,11 +144,8 @@ def main():
             opt.step()
             loss_sum += loss.item()
 
-        # 取得所有指標
         m_all, r_all, m_peak, r_peak = eval_metrics(model, valid_ld, thr)
         
-        # --- 自定義評分標準 (Score) ---
-        # 這裡結合了全域 RMSE 與 Peak RMSE，確保模型不會因為 0 太多而忽視大誤差
         score = (r_all * 0.4) + (r_peak * 0.6) 
 
         print(
