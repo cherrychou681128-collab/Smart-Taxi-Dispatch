@@ -4,7 +4,7 @@
 This project is a smart taxi dispatch system built for New York City. Instead of having drivers guess where their next passenger will be, this system uses AI to guide them to the right place at the right time.
 
 We use two main models to make this happen:
-* **ConvLSTM**: This model captures complex **spatial-temporal patterns** in past data, helping us exactly predict *when and where* the highest ride demand will happen.
+* **ConvLSTM**: This model captures complex spatial-temporal patterns in past data, helping us exactly predict *when and where* the highest ride demand will happen.
 * **XGBoost**: This looks at city data (like 311 service requests) to figure out how "valuable" or "profitable" a specific area is for drivers.
 
 The ultimate goal is to send drivers to busy areas *before* passengers even request a ride. This cuts down wait times for passengers and helps drivers earn money more efficiently.
