@@ -7,9 +7,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MODEL_PATH = "best_t24convlstm/best.pt"
 NPZ_PATH = "test_t24.npz"
-SAVE_NPZ_PATH = "plot_data.npz"  # 預測結果儲存路徑
+SAVE_NPZ_PATH = "plot_data.npz"
 
-# ===== ConvLSTM 模型 (結構必須與訓練時完全一致) =====
 class ConvLSTMCell(nn.Module):
     def __init__(self, in_ch, hid_ch, k=3):
         super().__init__()
@@ -54,7 +53,6 @@ class ConvLSTM(nn.Module):
         
         return self.head(h[-1])
 
-# ===== Load Data =====
 if not os.path.exists(NPZ_PATH):
     print(f"錯誤：找不到資料檔案 {NPZ_PATH}")
 else:
@@ -66,7 +64,6 @@ else:
     Y = torch.from_numpy(Y_raw).to(DEVICE)
     print(f"[INFO] 載入資料成功: X={X.shape}, Y={Y.shape}")
 
-    # ===== Load Model =====
     model = ConvLSTM().to(DEVICE)
     
     if not os.path.exists(MODEL_PATH):
@@ -76,11 +73,9 @@ else:
         model.eval()
         print(f"[INFO] 成功載入模型權重: {MODEL_PATH}")
 
-        # ===== Predict =====
         with torch.no_grad():
             pred = model(X)
 
-        # ===== 評估 RMSE、MAE =====
         y_true_np = Y.cpu().numpy()
         y_pred_np = pred.cpu().numpy()
 
@@ -93,7 +88,6 @@ else:
         print(f"MAE  = {mae:.4f}")
         print("=====================================")
 
-        # ===== 關鍵新增：儲存預測結果供繪圖使用 =====
         print(f"[INFO] 正在將結果儲存至 {SAVE_NPZ_PATH}...")
         np.savez(SAVE_NPZ_PATH, y_true=y_true_np, y_pred=y_pred_np)
         print("[SUCCESS] 檔案已產生。")
